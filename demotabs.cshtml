@@ -1,0 +1,2447 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Instrument Database</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,700,900" rel="stylesheet">
+    <link href="../../Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="../../Content/font-awesome.min.css" rel="stylesheet" />
+    <link href="../../Content/owl.carousel.css" rel="stylesheet" />
+    <link href="../../Content/owl.theme.css" rel="stylesheet" />
+    <link href="~/Content/meanmenu.min.css" rel="stylesheet" />
+    <link href="~/Content/jquery.mCustomScrollbar.min.css" rel="stylesheet" />
+    <link href="~/Content/animate.min.css" rel="stylesheet" />
+    <link href="~/Content/normalize.css" rel="stylesheet" />
+    <link href="~/Content/waves.min.css" rel="stylesheet" />
+    <link href="~/Content/button.css" rel="stylesheet" />
+    <link href="~/Content/main.css" rel="stylesheet" />
+    <link href="~/Content/style.css" rel="stylesheet" />
+    <link href="~/Content/responsee.css" rel="stylesheet" />
+    <script src="~/Scripts/modernizr-2.8.3.js"></script>
+    <link rel="stylesheet" href="../../Content/jquery.dataTables.min.css" />
+
+    @*<link href="../../Content/fixedHeader.dataTables.css" rel="stylesheet" />*@
+
+    @*<link rel="stylesheet" href="~/Views/Home/HomeStyle.css">*@
+
+    <script src="../../Scripts/jquery-3.5.1.js"></script>
+    <script src="../../Scripts/jquery.dataTables.min.js" defer></script>
+    @*<script src="../../Scripts/dataTables.fixedHeader.min.js"></script>*@
+
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.24/datatables.min.css" />
+
+    <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.24/datatables.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedcolumns/3.3.0/css/fixedColumns.dataTables.css">
+
+    <script type="text/javascript" src="https://cdn.datatables.net/fixedcolumns/3.3.0/js/dataTables.fixedColumns.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.24/sc-2.0.3/datatables.min.css" />
+
+    <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.24/sc-2.0.3/datatables.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.24/fc-3.3.2/r-2.2.7/datatables.min.css" />
+
+    <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.24/fc-3.3.2/r-2.2.7/datatables.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <link href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" rel="stylesheet" />
+
+
+    <script type="text/javascript">
+
+        var t = document.getElementById("example");
+
+        var j = [].reduce.call(t.rows, function (res, row) {
+            res[row.cells[0].textContent.slice(0, -1)] = row.cells[1].textContent;
+            return res
+        }, {});
+
+        document.querySelector("pre").textContent = JSON.stringify(j);
+
+        $(document).ready(function () {
+           /* populateTable(document.getElementById('example'), getData());*/
+
+            
+
+        function dataFields(data) {
+            return data.reduce((r, x) => Object.keys(x).reduce((s, k) => s.indexOf(k) === -1 ? s.concat(k) : s, r), []);
+        }
+
+        /* Can be useful if working with raw JSON data */
+        function searchCriteria(fields) {
+            return Array.from(fields).reduce((o, field) => {
+                return Object.assign(o, { [field.getAttribute('placeholder')]: field.value });
+            }, {});
+        }
+
+        function onFilter(e) {
+            let table = e.target.parentElement.parentElement.parentElement.parentElement;
+            let fields = table.querySelectorAll('thead tr th input');
+            let criteria = searchCriteria(fields); // Unused, but useful if filtering bindable data
+            let searchText = Array.from(fields).map(field => field.value.trim());
+            Array.from(table.querySelectorAll('tbody tr')).forEach(row => {
+                let hideRow = false;
+                Array.from(row.children).forEach((col, index) => {
+                    var value = col.innerHTML.trim().toLowerCase();
+                    var search = searchText[index].toLowerCase();
+                    if (search.length > 0) {
+                        if (!value.startsWith(search)) { /* or value.indexOf(search) === -1 */
+                            hideRow = true;
+                            return;
+                        }
+                    }
+                });
+                row.classList.toggle('hidden-row', hideRow);
+            });
+        }
+
+        function populateTable(table, data) {
+            let fields = dataFields(data);
+            let thead = document.createElement('THEAD');
+            let tr = document.createElement('TR');
+            fields.forEach(field => {
+                let th = document.createElement('TH');
+                th.innerHTML = field;
+                tr.appendChild(th);
+            });
+            thead.appendChild(tr);
+            let tbody = document.createElement('TBODY');
+            tr = document.createElement('TR');
+            fields.forEach(field => {
+                let th = document.createElement('TH');
+                let input = document.createElement('INPUT');
+                input.setAttribute('placeholder', field);
+                input.addEventListener('keyup', onFilter);
+                th.append(input);
+                tr.appendChild(th);
+            });
+            thead.appendChild(tr);
+            data.forEach(record => {
+                let tr = document.createElement('TR');
+                fields.forEach(field => {
+                    let td = document.createElement('TD');
+                    td.innerHTML = record[field];
+                    tr.appendChild(td);
+                });
+                tbody.append(tr);
+            });
+            table.appendChild(thead);
+            table.appendChild(tbody);
+        }
+
+       
+
+        });
+
+        $(document).ready(function () {
+            // Setup - add a text input to each footer cell
+            $('#example1 thead tr').clone(true).appendTo('#example1 thead');
+            $('#example1 thead tr:eq(1) th').each(function (i) {
+                var title = $(this).text();
+                $(this).html('<input type="text" /*placeholder="Search ' + title + '*/" />');
+
+                $('input', this).on('keyup change', function () {
+                    if (table.column(i).search() !== this.value) {
+                        table
+                            .column(i)
+                            .search(this.value)
+                            .draw();
+                    }
+                });
+            });
+
+            var table = $('#example1').DataTable({
+                orderCellsTop: true,
+                fixedHeader: true,
+                scrollY: 370,
+                scrollX: true,
+                paging: false,
+                autowidth: true,
+                pageLength: false,
+                bInfo: false
+
+            });
+        });
+        $(document).ready(function () {
+            // Setup - add a text input to each footer cell
+            $('#example2 thead tr').clone(true).appendTo('#example2 thead');
+            $('#example2 thead tr:eq(1) th').each(function (i) {
+                var title = $(this).text();
+                $(this).html('<input type="text" /*placeholder="Search ' + title + '*/" />');
+
+                $('input', this).on('keyup change', function () {
+                    if (table.column(i).search() !== this.value) {
+                        table
+                            .column(i)
+                            .search(this.value)
+                            .draw();
+                    }
+                });
+            });
+
+            $('#VendorTab').show();
+
+            var table = $('#example2').DataTable({
+                orderCellsTop: true,
+                fixedHeader: true,
+                scrollY: 370,
+                /*scrollX: true,*/
+                //paging: false,
+                autowidth: true,
+                //pageLength: false,
+                bInfo: false,
+                scroller: true,
+
+
+
+            });
+            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                $($.fn.dataTable.tables(true)).DataTable()
+                    .scroller.measure();
+
+
+            })
+
+
+        });
+
+        $(document).ready(function () {
+            // Setup - add a text input to each footer cell
+            $('#example3 thead tr').clone(true).appendTo('#example3 thead');
+            $('#example3 thead tr:eq(1) th').each(function (i) {
+                var title = $(this).text();
+                $(this).html('<input type="text" /*placeholder="Search ' + title + '*/" />');
+
+                $('input', this).on('keyup change', function () {
+                    if (table.column(i).search() !== this.value) {
+                        table
+                            .column(i)
+                            .search(this.value)
+                            .draw();
+                    }
+                });
+            });
+
+            $('#ManfTab').show();
+
+
+            var table = $('#example3').DataTable({
+                orderCellsTop: true,
+                fixedHeader: true,
+                scrollY: 370,
+                /*scrollX: true,*/
+                //paging: false,
+                autowidth: true,
+                //pageLength: false,
+                bInfo: false,
+                scroller: true,
+
+
+
+
+            });
+            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                $($.fn.dataTable.tables(true)).DataTable()
+                    .scroller.measure();
+
+
+            })
+
+        });
+
+
+        $(document).ready(function () {
+            // Setup - add a text input to each footer cell
+            $('#example4 thead tr').clone(true).appendTo('#example4 thead');
+            $('#example4 thead tr:eq(1) th').each(function (i) {
+                var title = $(this).text();
+                $(this).html('<input type="text" /*placeholder="Search ' + title + '*/" />');
+
+                $('input', this).on('keyup change', function () {
+                    if (table.column(i).search() !== this.value) {
+                        table
+                            .column(i)
+                            .search(this.value)
+                            .draw();
+                    }
+                });
+
+            });
+
+            $('#InstypeTab').show();
+            var table = $('#example4').DataTable({
+                orderCellsTop: true,
+                fixedHeader: true,
+                scrollY: 370,
+                /*scrollX: true,*/
+                //paging: false,
+                autowidth: true,
+                //pageLength: false,
+                bInfo: false,
+                scroller: true,
+
+
+
+
+            });
+            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                $($.fn.dataTable.tables(true)).DataTable()
+                    .scroller.measure();
+
+
+            })
+        });
+
+        $(document).ready(function () {
+            // Setup - add a text input to each footer cell
+            $('#example5 thead tr').clone(true).appendTo('#example5 thead');
+            $('#example5 thead tr:eq(1) th').each(function (i) {
+                var title = $(this).text();
+                $(this).html('<input type="text" /*placeholder="Search ' + title + '*/" />');
+
+                $('input', this).on('keyup change', function () {
+                    if (table.column(i).search() !== this.value) {
+                        table
+                            .column(i)
+                            .search(this.value)
+                            .draw();
+                    }
+                });
+            });
+
+            var table = $('#example5').DataTable({
+                orderCellsTop: true,
+                fixedHeader: true,
+                scrollY: 370,
+                /*scrollX: true,*/
+                //paging: false,
+                autowidth: true,
+                //pageLength: false,
+                bInfo: false,
+                scroller: true,
+
+
+
+
+            });
+            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                $($.fn.dataTable.tables(true)).DataTable()
+                    .scroller.measure();
+
+
+            })
+        });
+
+
+
+
+
+        $(document).ready(function () {
+            // Setup - add a text input to each footer cell
+            $('#example7 thead tr').clone(true).appendTo('#example7 thead');
+            $('#example7 thead tr:eq(1) th').each(function (i) {
+                var title = $(this).text();
+                $(this).html('<input type="text" /*placeholder="Search ' + title + '*/" />');
+
+                $('input', this).on('keyup change', function () {
+                    if (table.column(i).search() !== this.value) {
+                        table
+                            .column(i)
+                            .search(this.value)
+                            .draw();
+                    }
+                });
+            });
+
+            var table = $('#example7').DataTable({
+                orderCellsTop: true,
+                fixedHeader: true,
+                scrollY: 370,
+                scrollX: true,
+                paging: false,
+                autowidth: true,
+                pageLength: false,
+                bInfo: false
+
+            });
+
+
+        });
+
+        $(document).ready(function () {
+            // Setup - add a text input to each footer cell
+            $('#example6 thead tr').clone(true).appendTo('#example6 thead');
+            $('#example6 thead tr:eq(1) th').each(function (i) {
+                var title = $(this).text();
+                $(this).html('<input type="text" /*placeholder="Search ' + title + '*/" />');
+
+                $('input', this).on('keyup change', function () {
+                    if (table.column(i).search() !== this.value) {
+                        table
+                            .column(i)
+                            .search(this.value)
+                            .draw();
+                    }
+                });
+
+            });
+
+            $('#InfgrpTab').show();
+            var table = $('#example6').DataTable({
+                orderCellsTop: true,
+                fixedHeader: true,
+                scrollY: 370,
+                /*scrollX: true,*/
+                //paging: false,
+                autowidth: true,
+                //pageLength: false,
+                bInfo: false,
+                scroller: true,
+
+
+
+
+            });
+            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                $($.fn.dataTable.tables(true)).DataTable()
+                    .scroller.measure();
+
+
+            })
+        });
+
+
+        $(document).ready(function () {
+            // Setup - add a text input to each footer cell
+            $('#exampleTemp thead tr').clone(true).appendTo('#exampleTemp thead');
+            $('#exampleTemp thead tr:eq(1) th').each(function (i) {
+                var title = $(this).text();
+                $(this).html('<input type="text" /*placeholder="Search ' + title + '*/" />');
+
+                $('input', this).on('keyup change', function () {
+                    if (table.column(i).search() !== this.value) {
+                        table
+                            .column(i)
+                            .search(this.value)
+                            .draw();
+                    }
+                });
+            });
+
+            var table = $('#exampleTemp').DataTable({
+                orderCellsTop: true,
+                fixedHeader: true,
+                scrollY: 370,
+                /*scrollX: true,*/
+                //paging: false,
+                autowidth: true,
+                //pageLength: false,
+                bInfo: false,
+                scroller: true,
+
+
+
+
+            });
+            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                $($.fn.dataTable.tables(true)).DataTable()
+                    .scroller.measure();
+
+
+            })
+
+
+        });
+
+
+        $(function () {
+            $("#tabs").tabs();
+        });
+
+
+
+
+    </script>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            white-space:nowrap;
+            font-size:16px;
+            table-layout:auto;
+        }
+
+            table thead tr th {
+                text-transform: capitalize;
+                
+                
+                
+            }
+
+            table thead tr:last-child {
+                background: #eaeaea;
+                border-bottom: 4px double #cbcbcb;
+            }
+
+            table thead tr th input {
+                width: auto;
+            }
+
+            table tbody tr:nth-child(even) {
+                background-color: #f2f2f2;
+            }
+
+            table tbody tr.hidden-row {
+                display: none;
+            }
+    </style>
+</head>
+
+<body>
+    <div id="tabs">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="widget-tabs-int mg-t-30">
+
+                <div class="tab-hd">
+                    <img class="imgstyle" src="~/Images/pgsvg.svg" alt="" />
+                    <h2 style="font-weight:900">Sacramento Instrument Spec DB</h2>
+                    <div class="sidetab" style="float:right;margin-top:-4%">
+                        <button class="btn" onclick="window.location.href='Index'"><i class="fa fa-home"></i> Home</button>
+                        @*<button class="btn"><i class="fa fa-bars"></i> Menu</button>
+                            <button class="btn"><i class="fa fa-trash"></i> Trash</button>
+                            <button class="btn"><i class="fa fa-close"></i> Close</button>
+                            <button class="btn"><i class="fa fa-folder"></i> Folder</button>*@
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="widget-tabs-list tab-pt-mg">
+                            <ul class="nav nav-tabs tab-nav-center ul_font nav-justified text-justify" role="tablist">
+                                <li><a data-toggle="tab" href="#home" role="tab"><i class="fa fa-home"></i> Home</a></li>
+                                <li><a data-toggle="tab" href="#InstTab"><i class="fa fa-industry" aria-hidden="true"></i> Instruments</a></li>
+
+                                <li><a data-toggle="tab" href="#VendorTab"><i class="fa fa-users" aria-hidden="true"></i> Vendors</a></li>
+                                <li><a data-toggle="tab" href="#ManfTab"><i class="fa fa-cog" aria-hidden="true"></i> Manufacturers</a></li>
+                                <li><a data-toggle="tab" href="#TemplateTab"><i class="fa fa-files-o" aria-hidden="true"></i> Templates</a></li>
+                                <li><a data-toggle="tab" href="#InstypeTab"><i class="fa fa-cogs" aria-hidden="true"></i> Instrument&nbspTypes</a></li>
+                                <li><a data-toggle="tab" href="#InfTab"><i class="fa fa-table" aria-hidden="true"></i> Information&nbspTypes</a></li>
+                                <li><a data-toggle="tab" href="#InfgrpTab" role="tab"><i class="fa fa-object-group" aria-hidden="true"></i> Information&nbspGroups</a></li>
+                                <li><a data-toggle="tab" href="#LoopTab"><i class="fa fa-files-o" aria-hidden="true"></i> Loops</a></li>
+                            </ul>
+                            <div class="tab-content tab-custom-st">
+                                <div id="home" class="tab-pane in active animated zoomInLeft">
+                                    <div class="tab-ctn p-t-5">
+                                        @*<p style="font-size:13px">Instrument Information</p>
+                                            <p class="tab-mg-b-0" style="font-size:13px">All Instruments Information</p>*@
+                                        <div>
+
+                                            <table id="example" class="pure-table pure-table-horizontal">
+
+                                                
+
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Area</th>
+                                                            <th>Empty</th>
+                                                            <th>BoilerHouse</th>
+                                                            <th>Ester Making</th>
+                                                            <th>Fatty Acid</th>
+                                                            <th>Fatty Acid Utility</th>
+                                                            <th>HFA</th>
+                                                            <th>HFA Utility</th>
+                                                            <th>Refinery</th>
+                                                            <th>Refinery Utility</th>
+                                                            <th>Tank Farm</th>
+                                                            <th>Tank Farm Utility</th>
+                                                            <th>Total</th>
+                                                        </tr>
+
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>(empty)</td>
+                                                            <td>298</td>
+                                                            <td>5</td>
+                                                            <td>-</td>
+                                                            <td>44</td>
+                                                            <td>35</td>
+                                                            <td>1314</td>
+                                                            <td>45</td>
+                                                            <td>655</td>
+                                                            <td>52</td>
+                                                            <td>176</td>
+                                                            <td>49</td>
+                                                            <td>2673</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>3-Way Valve</td>
+                                                            <td>1</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>1</td>
+                                                            <td>-</td>
+                                                            <td>4</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>6</td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>Alarm</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>16</td>
+                                                            <td>-</td>
+                                                            <td>6</td>
+                                                            <td>-</td>
+                                                            <td>3</td>
+                                                            <td>-</td>
+                                                            <td>25</td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>Annubar</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>1</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>1</td>
+                                                            <td>-</td>
+                                                            <td>2</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>4</td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>Ball Valve</td>
+                                                            <td>20</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>8</td>
+                                                            <td>-</td>
+                                                            <td>15</td>
+                                                            <td>-</td>
+                                                            <td>15</td>
+                                                            <td>-</td>
+                                                            <td>7</td>
+                                                            <td>1</td>
+                                                            <td>66</td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>Bulb Transmitter</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>1</td>
+                                                            <td>-</td>
+                                                            <td>2</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>3</td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>Butterfly Valve</td>
+                                                            <td>5</td>
+                                                            <td>-</td>
+                                                            <td>2</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>7</td>
+                                                            <td>-</td>
+                                                            <td>1</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>15</td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>Conductivity Analyser</td>
+                                                            <td>-</td>
+                                                            <td>1</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>1</td>
+                                                        </tr>
+
+
+                                                        <tr>
+                                                            <td>D/P Transmitter</td>
+                                                            <td>8</td>
+                                                            <td>-</td>
+                                                            <td>12</td>
+                                                            <td>6</td>
+                                                            <td>-</td>
+                                                            <td>50</td>
+                                                            <td>-</td>
+                                                            <td>28</td>
+                                                            <td>1</td>
+                                                            <td>2</td>
+                                                            <td>-</td>
+                                                            <td>107</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Flame Scanner</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>3</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>3</td>
+                                                        </tr>
+
+
+
+                                                        <tr>
+                                                            <td>Flow Indicator</td>
+                                                            <td>8</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>1</td>
+                                                            <td>-</td>
+                                                            <td>5</td>
+                                                            <td>-</td>
+                                                            <td>5</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>19</td>
+                                                        </tr>
+
+
+
+                                                        <tr>
+                                                            <td>Flow Switch</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>3</td>
+                                                            <td>-</td>
+                                                            <td>1</td>
+                                                            <td>1</td>
+                                                            <td>4</td>
+                                                            <td>3</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>4</td>
+                                                            <td>16</td>
+                                                        </tr>
+
+
+
+                                                        <tr>
+                                                            <td>Flow Transmitter</td>
+                                                            <td>29</td>
+                                                            <td>9</td>
+                                                            <td>5</td>
+                                                            <td>4</td>
+                                                            <td>-</td>
+                                                            <td>41</td>
+                                                            <td>1</td>
+                                                            <td>19</td>
+                                                            <td>-</td>
+                                                            <td>8</td>
+                                                            <td>1</td>
+                                                            <td>117</td>
+                                                        </tr>
+
+
+
+                                                        <tr>
+                                                            <td>Gas Analiser</td>
+                                                            <td>2</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>15</td>
+                                                            <td>-</td>
+                                                            <td>1</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>18</td>
+                                                        </tr>
+
+
+
+                                                        <tr>
+                                                            <td>Globe Valve</td>
+                                                            <td>68</td>
+                                                            <td>10</td>
+                                                            <td>9</td>
+                                                            <td>15</td>
+                                                            <td>2</td>
+                                                            <td>106</td>
+                                                            <td>8</td>
+                                                            <td>46</td>
+                                                            <td>3</td>
+                                                            <td>5</td>
+                                                            <td>-</td>
+                                                            <td>272</td>
+                                                        </tr>
+
+
+
+                                                        <tr>
+                                                            <td>I/P & Misc</td>
+                                                            <td>1</td>
+                                                            <td>-</td>
+                                                            <td>1</td>
+                                                            <td>1</td>
+                                                            <td>-</td>
+                                                            <td>31</td>
+                                                            <td>-</td>
+                                                            <td>8</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>42</td>
+                                                        </tr>
+
+
+
+                                                        <tr>
+                                                            <td>Indicating Controller</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>6</td>
+                                                            <td>-</td>
+                                                            <td>3</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>9</td>
+                                                        </tr>
+
+
+
+                                                        <tr>
+                                                            <td>Indicator(xmtr)</td>
+                                                            <td>1</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>8</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>1</td>
+                                                            <td>-</td>
+                                                            <td>10</td>
+                                                        </tr>
+
+
+
+                                                        <tr>
+                                                            <td>Level Controller</td>
+                                                            <td>2</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>6</td>
+                                                            <td>-</td>
+                                                            <td>7</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>15</td>
+                                                        </tr>
+
+
+
+                                                        <tr>
+                                                            <td>Level Glass</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>3</td>
+                                                            <td>-</td>
+                                                            <td>20</td>
+                                                            <td>-</td>
+                                                            <td>11</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>34</td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>Solenoid Valve</td>
+                                                            <td>1</td>
+                                                            <td>14</td>
+                                                            <td>-</td>
+                                                            <td>7</td>
+                                                            <td>-</td>
+                                                            <td>14</td>
+                                                            <td>1</td>
+                                                            <td>1</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>2</td>
+                                                            <td>40</td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>Weigh Transmitter</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>2</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>2</td>
+
+                                                        </tr>
+                                                    </tbody>
+
+                                                
+
+                                            </table>
+                                            <pre></pre>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="InstTab" class="tab-pane animated zoomInLeft">
+                                    <div class="tab-ctn p-t-5">
+                                        @*<p>this is menu2 content</p>
+                                            <p class="tab-mg-b-0">this is menu2 content</p>*@
+                                        <table id="example1" class="display" style="width:100%">
+                                            <thead>
+                                                <tr>
+                                                    <th>Instrument Type</th>
+                                                    <th>TagName</th>
+                                                    <th>Loop No</th>
+                                                    <th>Description</th>
+                                                    <th>Type</th>
+                                                    <th>Area</th>
+                                                    <th>P&ID No</th>
+                                                    <th>Model No</th>
+                                                    <th>Needs Updating</th>
+                                                    <th>Spec Info</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Level Transmitter</td>
+                                                    <td>1614</td>
+                                                    <td>1614</td>
+                                                    <td>TANK 410 ESTER STORAGE TANK</td>
+                                                    <td>Radar Level transmitter</td>
+                                                    <td>Tank Farm</td>
+                                                    <td>C-451675</td>
+                                                    <td></td>
+                                                    <td>no</td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Pressure Transmitter</td>
+                                                    <td>5377</td>
+                                                    <td>5377</td>
+                                                    <td>Tank 407 Nitrogen Pressure</td>
+                                                    <td>Guage Pressure Transmitter</td>
+                                                    <td>Tank Farm</td>
+                                                    <td>C-451679</td>
+                                                    <td>3051CG1A22A1AM5DFE5</td>
+                                                    <td>no</td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Level Transmitter</td>
+                                                    <td>9004</td>
+                                                    <td>9004</td>
+                                                    <td>TANK 402 ESTER STORAGE TANK</td>
+                                                    <td>Radar Level transmitter</td>
+                                                    <td>Tank Farm</td>
+                                                    <td>C-451675</td>
+                                                    <td></td>
+                                                    <td>no</td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>On/Off Valve</td>
+                                                    <td>9359</td>
+                                                    <td>9359</td>
+                                                    <td>TANK 411 INLET LINE-1 ON/OFF VALVE</td>
+                                                    <td></td>
+                                                    <td>Tank Farm</td>
+                                                    <td>C-451675</td>
+                                                    <td></td>
+                                                    <td>no</td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>pH Analyzer</td>
+                                                    <td>AE/AIT0000</td>
+                                                    <td>0</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td>no</td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>pH Analyzer</td>
+                                                    <td>AE/AT2942</td>
+                                                    <td>2942</td>
+                                                    <td>N. FAT TRAP DISCH pH</td>
+                                                    <td></td>
+                                                    <td>Refinery</td>
+                                                    <td>C-463545</td>
+                                                    <td></td>
+                                                    <td>no</td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Gas Analyzer</td>
+                                                    <td>AI2761</td>
+                                                    <td>2761</td>
+                                                    <td>DOWTHERM EXHAUST O2 PROBE #2</td>
+                                                    <td></td>
+                                                    <td>HFA</td>
+                                                    <td>C-338736</td>
+                                                    <td></td>
+                                                    <td>no</td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Gas Analyzer</td>
+                                                    <td>AIT-6172</td>
+                                                    <td>6172</td>
+                                                    <td>O2 Analyser From N. HFA Sensor #2</td>
+                                                    <td></td>
+                                                    <td>HFA</td>
+                                                    <td>CN-3412194</td>
+                                                    <td>FX-SMT Series</td>
+                                                    <td>no</td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Opacity Glass</td>
+                                                    <td>AIT/AE1211</td>
+                                                    <td>1211</td>
+                                                    <td>OVHDS CLARITY AFTER FILTER</td>
+                                                    <td></td>
+                                                    <td>HFA</td>
+                                                    <td>CN-2168</td>
+                                                    <td></td>
+                                                    <td>no</td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Globe Valve</td>
+                                                    <td>AV-6431</td>
+                                                    <td>6431</td>
+                                                    <td>Nitrogen Flow To Distalltion Header Vent Line</td>
+                                                    <td>1 1/2" EZ GLOBE VALVE TYPE 667</td>
+                                                    <td>HFA</td>
+                                                    <td>CN-3412194</td>
+                                                    <td></td>
+                                                    <td>no</td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Flame Scanner</td>
+                                                    <td>BE-9093</td>
+                                                    <td>9093</td>
+                                                    <td>Flame Scanner N. Hydrogen Heater</td>
+                                                    <td>Ultra violet detector</td>
+                                                    <td>HFA</td>
+                                                    <td>C-613367</td>
+                                                    <td>C7012C</td>
+                                                    <td>no</td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Vortex & Turbine Meter</td>
+                                                    <td>FE/FT1143</td>
+                                                    <td>1143</td>
+                                                    <td>STEAM TO LCFA STRIPPER</td>
+                                                    <td></td>
+                                                    <td>Fatty Acid</td>
+                                                    <td>CN-1034</td>
+                                                    <td>YEWFLO YF115-NNNA3A-S3S3 C/FMF/SCT W/ CONVERTER (S</td>
+                                                    <td>no</td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Flow Transmitter</td>
+                                                    <td>FE/FT1340</td>
+                                                    <td>1340</td>
+                                                    <td>Surge Tank Make-up Flow</td>
+                                                    <td></td>
+                                                    <td>BoilerHouse</td>
+                                                    <td>SAC-T-1200</td>
+                                                    <td></td>
+                                                    <td>no</td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Flow Transmitter</td>
+                                                    <td>FE/FT1809</td>
+                                                    <td>1809</td>
+                                                    <td>ITE STILL FEED</td>
+                                                    <td>MASS FLOW METER</td>
+                                                    <td>HFA</td>
+                                                    <td>CN-S342</td>
+                                                    <td></td>
+                                                    <td>no</td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Annubar</td>
+                                                    <td>FE8102A</td>
+                                                    <td>8102</td>
+                                                    <td>DRY FEED TO DRYERS</td>
+                                                    <td>ANNUBAR PITOT TUBE</td>
+                                                    <td>Refinery</td>
+                                                    <td>CN-8427</td>
+                                                    <td>65M1001-8"-2B15M</td>
+                                                    <td>no</td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Flow Indicator</td>
+                                                    <td>FI5606</td>
+                                                    <td>5606</td>
+                                                    <td>Ester Blend Feed Flow Indicator</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td>no</td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Totalizer</td>
+                                                    <td>FQIC8503</td>
+                                                    <td>8503</td>
+                                                    <td>MOTT FILTER FEED</td>
+                                                    <td>TOTALIZING CONTROLLER</td>
+                                                    <td>HFA</td>
+                                                    <td>CN-2138</td>
+                                                    <td>790705-141</td>
+                                                    <td>no</td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Flow Switch</td>
+                                                    <td>FSH-2998</td>
+                                                    <td>2998</td>
+                                                    <td>REFINERY SAFETY SHOWERS ACTIVATION</td>
+                                                    <td></td>
+                                                    <td>Ester Making</td>
+                                                    <td>C-459088</td>
+                                                    <td></td>
+                                                    <td>no</td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Globe Valve</td>
+                                                    <td>FV/FY8548</td>
+                                                    <td>8548</td>
+                                                    <td>OVERHEADS FILTER FEED</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td>CN-2213</td>
+                                                    <td>1" EZ</td>
+                                                    <td>no</td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Ball Valve</td>
+                                                    <td>FV8692</td>
+                                                    <td>8692</td>
+                                                    <td>ESTER TO SETTLER #1 Fire Isolation Valve</td>
+                                                    <td>4" BALL VALVE</td>
+                                                    <td>Refinery</td>
+                                                    <td>CN-2181</td>
+                                                    <td>4-5150-31-2236MT</td>
+                                                    <td>no</td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Solenoid Valve</td>
+                                                    <td>FY1826</td>
+                                                    <td>1826</td>
+                                                    <td>VAPOR BLOCK VALVES</td>
+                                                    <td>SOLENOID VALVE</td>
+                                                    <td>HFA</td>
+                                                    <td>CN-S342</td>
+                                                    <td>8316</td>
+                                                    <td>no</td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Level Glass</td>
+                                                    <td>LG8485</td>
+                                                    <td>8485</td>
+                                                    <td>H2 RECYCLE SEPARATOR</td>
+                                                    <td>REFLEX LEVEL GAUGE GLASS</td>
+                                                    <td>HFA</td>
+                                                    <td>C-745196</td>
+                                                    <td>19-R-20</td>
+                                                    <td>no</td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Indicator (xmtr)</td>
+                                                    <td>LI0000A</td>
+                                                    <td>0</td>
+                                                    <td>Standard Loop Powered Indicator (Level)</td>
+                                                    <td>Local 4-20mA transducer</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td>751</td>
+                                                    <td>no</td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>I/P & Misc</td>
+                                                    <td>LY8154</td>
+                                                    <td>8154</td>
+                                                    <td>ESTER FLASH CONDENSATE LEVEL</td>
+                                                    <td>I/P TRANSDUCER/POSITIONER</td>
+                                                    <td>Refinery</td>
+                                                    <td>CN-7097</td>
+                                                    <td>3590-1</td>
+                                                    <td>no</td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Pressure Indicator</td>
+                                                    <td>PI1282</td>
+                                                    <td>1282</td>
+                                                    <td>LCFA WASH COL BOTTOMS HOT FEED TO STRPR</td>
+                                                    <td>0-60 PSI PRESS GAUGE</td>
+                                                    <td>Fatty Acid</td>
+                                                    <td>CN-1034</td>
+                                                    <td>45-1279-SS-04L-XOSPDNH-0/60PSI</td>
+                                                    <td>no</td>
+                                                    <td></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div id="VendorTab" class="tab-pane animated zoomInLeft">
+                                    <div class="tab-ctn">
+                                        @*<p>this is menu3 content</p>
+                                            <p class="tab-mg-b-0">this is maincontent in menu3.</p>*@
+                                        <table id="example2" class="display" style="width:100%" responsive="scroll">
+                                            <thead>
+                                                <tr>
+                                                    <th>Vendor</th>
+                                                    <th>Phone No</th>
+                                                    <th>Contact</th>
+                                                    <th>Instrument Count</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr><td>*</td><td></td><td></td><td>5</td></tr>
+                                                <tr><td>A&A</td><td>(713) 938-4270</td><td></td><td>2</td></tr>
+                                                <tr><td>Advanced Control Solutions</td><td>(510) 262-1882</td><td>Paul Mahoney</td><td>29</td></tr>
+                                                <tr><td>APC</td><td>(925) 846-9000</td><td>Dave Kandel</td><td>1267</td></tr>
+                                                <tr><td>Assoc. Flow Ctrls</td><td>(510) 820-1216</td><td>Jay</td><td>1</td></tr>
+                                                <tr><td>Automation Prod</td><td>(713) 869-0361</td><td>Steve Sawyer</td><td>9</td></tr>
+                                                <tr><td>Automation Service</td><td></td><td></td><td>4</td></tr>
+                                                <tr><td>BAKER FURNACE</td><td></td><td></td><td>1</td></tr>
+                                                <tr><td>Bearing Supply</td><td>(916) 443-4816</td><td></td><td>2</td></tr>
+                                                <tr><td>Belilove</td><td>(510) 658-9011</td><td>Peter Rothermel</td><td>72</td></tr>
+                                                <tr><td>Berindsen</td><td>(916) 372-0550</td><td></td><td>1</td></tr>
+                                                <tr><td>Buringurd</td><td>(707) 486-2490</td><td></td><td>41</td></tr>
+                                                <tr><td>Burling Inst</td><td>(201) 635-9481</td><td></td><td>6</td></tr>
+                                                <tr><td>Burns</td><td>(800) 328-3871</td><td>Judy</td><td>254</td></tr>
+                                                <tr><td>Cal Pacific</td><td>(510) 527-6728</td><td></td><td>9</td></tr>
+                                                <tr><td>California Hydronics Corp.</td><td>(510) 293-1993</td><td></td><td>1</td></tr>
+                                                <tr><td>Caltrol</td><td></td><td></td><td>49</td></tr>
+                                                <tr><td>Catawissa</td><td>(717) 356-2311</td><td>Patricia Wondoloski</td><td>1</td></tr>
+                                                <tr><td>Cfm</td><td>(510) 370-1500</td><td></td><td>4</td></tr>
+                                                <tr><td>Christi-Machine</td><td>(916) 631-0917</td><td>Fred Finsterbusch</td><td>4</td></tr>
+                                                <tr><td>Clipper Controls</td><td></td><td></td><td>1</td></tr>
+                                                <tr><td>Colesco</td><td>(513) 489-1122</td><td>Harold or Steve</td><td>3</td></tr>
+                                                <tr><td>Control Specialties</td><td></td><td></td><td>75</td></tr>
+                                                <tr><td>Controlco</td><td>(916) 927-5599</td><td></td><td>38</td></tr>
+                                                <tr><td>Controltech</td><td>(916) 922-9367</td><td></td><td>4</td></tr>
+                                                <tr><td>Crane</td><td>(815) 727-2600</td><td>Lillian</td><td>5</td></tr>
+                                                <tr><td>Daniel</td><td></td><td></td><td>6</td></tr>
+                                                <tr><td>Duhig</td><td></td><td></td><td>4</td></tr>
+                                                <tr><td>Dwyer</td><td></td><td></td><td>3</td></tr>
+                                                <tr><td>Dynalco</td><td>(305) 739-4300</td><td></td><td>7</td></tr>
+                                                <tr><td>Emerson</td><td></td><td></td><td>25</td></tr>
+                                                <tr><td>Emerson Rosemount</td><td></td><td></td><td>2</td></tr>
+                                                <tr><td>Flo-Con</td><td>(510) 521-5000</td><td>Charles Waters</td><td>1</td></tr>
+                                                <tr><td>Flomax Prod</td><td>(510) 449-5900</td><td>Jerry Morgenroth</td><td>18</td></tr>
+                                                <tr><td>Flow Technology</td><td>(602) 437-1315</td><td></td><td>14</td></tr>
+                                                <tr><td>Flw</td><td>(510) 651-6511</td><td></td><td>18</td></tr>
+                                                <tr><td>Frank A Olsen</td><td>(510) 839-5442</td><td></td><td>2</td></tr>
+                                                <tr><td>G.M. Cooke Assoc</td><td>(510) 676-0783</td><td></td><td>2</td></tr>
+                                                <tr><td>Gayesco</td><td>(800) 235-2540</td><td>Tim Mclaughlin</td><td>11</td></tr>
+                                                <tr><td>General Process Controls</td><td>(916) 353-1507</td><td>Dave Peterson</td><td>20</td></tr>
+                                                <tr><td>Graybar</td><td></td><td></td><td>3</td></tr>
+                                                <tr><td>H2 Scan</td><td></td><td></td><td>7</td></tr>
+                                                <tr><td>Hammel Dahl</td><td>(508) 852-0200</td><td>Ed Cassidy</td><td>7</td></tr>
+                                                <tr><td>Hill & Watson</td><td></td><td></td><td>79</td></tr>
+                                                <tr><td>Hoerbiger</td><td>(805) 257-2888</td><td>Jerry Hubner</td><td>1</td></tr>
+                                                <tr><td>Honeywell</td><td>(916) 923-7805</td><td></td><td>228</td></tr>
+                                                <tr><td>Hydro-Thermal</td><td></td><td></td><td>1</td></tr>
+                                                <tr><td>J&B</td><td>(510) 866-1515</td><td>Bill Warfield</td><td>2</td></tr>
+                                                <tr><td>James Murray & Assoc</td><td>(513) 574-8500</td><td></td><td>1</td></tr>
+                                                <tr><td>Jensen Instr Co</td><td>(415) 589-9720</td><td></td><td>13</td></tr>
+                                                <tr><td>Johnson Ctrls</td><td>(916) 635-6699</td><td>Mark Prioletta</td><td>5</td></tr>
+                                                <tr><td>Katz Controls</td><td>(408) 725-8671</td><td>Sam Katz</td><td>1</td></tr>
+                                                <tr><td>Kele</td><td></td><td></td><td>0</td></tr>
+                                                <tr><td>L</td><td></td><td></td><td>1</td></tr>
+                                                <tr><td>Linden systems</td><td></td><td></td><td>14</td></tr>
+                                                <tr><td>M.L.Johnson</td><td>(513) 874-8445</td><td></td><td>1</td></tr>
+                                                <tr><td>Mac Tech</td><td>(510) 632-2000</td><td>Charles Feltman</td><td>3</td></tr>
+                                                <tr><td>Magnatrol</td><td></td><td></td><td>2</td></tr>
+                                                <tr><td>McJUNKIN</td><td></td><td></td><td>26</td></tr>
+                                                <tr><td>McJUNKINRedman</td><td></td><td></td><td>5</td></tr>
+                                                <tr><td>McMaster Carr</td><td>(310) 692-5911 x2</td><td>Rose</td><td>1</td></tr>
+                                                <tr><td>MCR Technologies</td><td></td><td></td><td>3</td></tr>
+                                                <tr><td>Micromotion</td><td>(925) 362-4091</td><td>Dave Schratz</td><td>68</td></tr>
+                                                <tr><td>Milligan Spika Co</td><td>(510) 562-6667</td><td>Rachel Haburjak</td><td>4</td></tr>
+                                                <tr><td>Mine Safety Appliance</td><td>(805) 581-1919</td><td>Ron Devlin</td><td>2</td></tr>
+                                                <tr><td>Monitek</td><td></td><td></td><td>1</td></tr>
+                                                <tr><td>Moore Prod</td><td>(415) 887-5535</td><td>J. Richard Shand</td><td>12</td></tr>
+                                                <tr><td>Motion Industries</td><td>(916) 455-1990</td><td>John</td><td>8</td></tr>
+                                                <tr><td>MRC Global</td><td>(661) 332-0654</td><td>Cameron Barker</td><td>24</td></tr>
+                                                <tr><td>MSA</td><td></td><td></td><td>0</td></tr>
+                                                <tr><td>Numatics Engineering</td><td></td><td></td><td>14</td></tr>
+                                                <tr><td>Oakland Valve and Fitting</td><td></td><td></td><td>1</td></tr>
+                                                <tr><td>Ohmart</td><td>(513) 272-0131</td><td>Jerry</td><td>70</td></tr>
+                                                <tr><td>Omega</td><td>(203) 359-1660</td><td></td><td>5</td></tr>
+                                                <tr><td>Palmer</td><td>(510) 770-8522</td><td>Bob Dickerson</td><td>20</td></tr>
+                                                <tr><td>PANAMETRICS</td><td></td><td></td><td>1</td></tr>
+                                                <tr><td>Parker Supply Company</td><td>(323) 268-3581</td><td>Debbie Miller</td><td>1</td></tr>
+                                                <tr><td>Phoenix Eq Co</td><td>(415) 479-2080</td><td></td><td>7</td></tr>
+                                                <tr><td>Process Management Gro</td><td></td><td></td><td>0</td></tr>
+                                                <tr><td>Relevant</td><td>(209) 300-6980</td><td>Bill Promes</td><td>1</td></tr>
+                                                <tr><td>RM Controls</td><td>(805) 499-4499</td><td>Ralph Matthews</td><td>4</td></tr>
+                                                <tr><td>Rosemount</td><td>(800) 999-9307</td><td>Tom Boerner</td><td>202</td></tr>
+                                                <tr><td>ROTRONIC Inst. Corp</td><td></td><td></td><td>1</td></tr>
+                                                <tr><td>RUST Automation</td><td>(801) 566-7878</td><td>Brandon Calvillo</td><td>3</td></tr>
+                                                <tr><td>Seco Controls</td><td>(888) 798-8300</td><td>David Langford</td><td>35</td></tr>
+                                                <tr><td>Storeroom</td><td></td><td></td><td>1</td></tr>
+                                                <tr><td>Technical Sales</td><td>(415) 346-1655</td><td></td><td>137</td></tr>
+                                                <tr><td>Tempresco</td><td>(510) 829-3400</td><td></td><td>1</td></tr>
+                                                <tr><td>Thermo Electric</td><td></td><td></td><td>5</td></tr>
+                                                <tr><td>Valin Corp</td><td>(510) 689-5200</td><td></td><td>4</td></tr>
+                                                <tr><td>Valley Electric</td><td>(916) 448-8271</td><td>Bill Knapp</td><td>10</td></tr>
+                                                <tr><td>Varec</td><td>(510) 521-5000</td><td>Charles Waters</td><td>14</td></tr>
+                                                <tr><td>Vossler</td><td></td><td></td><td>1</td></tr>
+                                                <tr><td>Wagner Process Equipment</td><td>(209) 931-0100</td><td>John Thorton</td><td>12</td></tr>
+                                                <tr><td>Windustrial</td><td></td><td></td><td>2</td></tr>
+
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+                                </div>
+                                <div id="ManfTab" class="tab-pane">
+                                    <div class="tab-ctn">
+                                        @*<p>this is content in menu4</p>
+                                            <p class="tab-mg-b-0">this is maincontent in menu4.</p>*@
+                                        <table id="example3" class="display" style="width:100%">
+                                            <thead>
+                                                <tr>
+
+                                                    <th>Manufacturer</th>
+                                                    <th>Phone No</th>
+                                                    <th>Instrument Count</th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr><td>ABB</td><td></td><td>4</td></tr>
+                                                <tr><td>Agar Technologies</td><td></td><td>0</td></tr>
+                                                <tr><td>Air Pax</td><td>(305) 587-1100</td><td>1</td></tr>
+                                                <tr><td>Allen-Bradley</td><td>(414) 382-2000</td><td>10</td></tr>
+                                                <tr><td>Apollo</td><td></td><td>223</td></tr>
+                                                <tr><td>Aquamatic</td><td></td><td>14</td></tr>
+                                                <tr><td>Asco</td><td>(201) 966-2000</td><td>53</td></tr>
+                                                <tr><td>Ashcroft</td><td>(800) 243-8160</td><td>453</td></tr>
+                                                <tr><td>Bailey</td><td>(510) 783-2705</td><td>2</td></tr>
+                                                <tr><td>Bellofram</td><td>(304) 387-1200</td><td>1</td></tr>
+                                                <tr><td>British Engine</td><td></td><td>2</td></tr>
+                                                <tr><td>Brooks</td><td>(213) 921-3486</td><td>23</td></tr>
+                                                <tr><td>Burling Inst. Co.</td><td>(201) 635-9481</td><td>6</td></tr>
+                                                <tr><td>Burns</td><td>(800) 328-3871</td><td>255</td></tr>
+                                                <tr><td>Catawissa</td><td>(717) 356-2311</td><td>1</td></tr>
+                                                <tr><td>Christi-Machine</td><td>(916) 631-0917</td><td>4</td></tr>
+                                                <tr><td>Cla-Val</td><td></td><td>1</td></tr>
+                                                <tr><td>Collins</td><td></td><td>3</td></tr>
+                                                <tr><td>Crane</td><td>(815) 727-2600</td><td>5</td></tr>
+                                                <tr><td>Crosby</td><td>(508) 384-3121</td><td>1</td></tr>
+                                                <tr><td>Daniel</td><td>(215) 641-3000</td><td>34</td></tr>
+                                                <tr><td>Davis Controls</td><td></td><td>1</td></tr>
+                                                <tr><td>Dezurik</td><td>(612) 259-2000</td><td>2</td></tr>
+                                                <tr><td>Drexelbrook</td><td>(800) 527-6297</td><td>39</td></tr>
+                                                <tr><td>Durco</td><td></td><td>7</td></tr>
+                                                <tr><td>Duro (Colesco)</td><td>(513) 489-1122</td><td>3</td></tr>
+                                                <tr><td>Dwyer</td><td>(714) 630-6424</td><td>9</td></tr>
+                                                <tr><td>Dynalco</td><td>(305) 739-4300</td><td>7</td></tr>
+                                                <tr><td>Dynatrol</td><td>(800) 231-2062</td><td>9</td></tr>
+                                                <tr><td>Ellison</td><td></td><td>3</td></tr>
+                                                <tr><td>Equimeter</td><td>(800) 375-8875</td><td>1</td></tr>
+                                                <tr><td>Ernst Prod</td><td>(908) 938-5641</td><td>12</td></tr>
+                                                <tr><td>Fairchild</td><td>(910) 659-3472</td><td>7</td></tr>
+                                                <tr><td>Fenwal</td><td></td><td>2</td></tr>
+                                                <tr><td>Fischer & Porter</td><td>(800) 421-3411</td><td>9</td></tr>
+                                                <tr><td>Fisher</td><td></td><td>648</td></tr>
+                                                <tr><td>Flow Tech</td><td>(602) 268-8776</td><td>14</td></tr>
+                                                <tr><td>Fluidic</td><td></td><td>1</td></tr>
+                                                <tr><td>Gayesco</td><td>(800) 235-8540</td><td>11</td></tr>
+                                                <tr><td>General Eastern</td><td></td><td>0</td></tr>
+                                                <tr><td>H2 Scan</td><td></td><td>7</td></tr>
+                                                <tr><td>Habonim</td><td></td><td>1</td></tr>
+                                                <tr><td>Hammel Dahl</td><td>(401) 781-6200</td><td>7</td></tr>
+                                                <tr><td>Helicoid</td><td>(203) 755-4300</td><td>83</td></tr>
+                                                <tr><td>Hoerbiger</td><td>(805) 257-2888</td><td>1</td></tr>
+                                                <tr><td>Honeywell</td><td>(800) 223-8947</td><td>269</td></tr>
+                                                <tr><td>Hydro-Thermal</td><td></td><td>1</td></tr>
+                                                <tr><td>ITT Barton</td><td>(213) 961-2547</td><td>2</td></tr>
+                                                <tr><td>Jerguson</td><td>(216) 572-7400</td><td>34</td></tr>
+                                                <tr><td>Johnson Controls</td><td>(916) 635-6699</td><td>3</td></tr>
+                                                <tr><td>Johnson-Yokogawa</td><td>(404) 254-0400</td><td>6</td></tr>
+                                                <tr><td>KING</td><td></td><td>2</td></tr>
+                                                <tr><td>Kistler Morse</td><td>(800) 426-9010</td><td>7</td></tr>
+                                                <tr><td>L&N</td><td>(714) 937-1647</td><td>1</td></tr>
+                                                <tr><td>Leeds & Northrup</td><td></td><td>2</td></tr>
+                                                <tr><td>Magnatrol</td><td>(708) 969-4000</td><td>12</td></tr>
+                                                <tr><td>Magnatrol Valves</td><td>(973) 427-4341</td><td>4</td></tr>
+                                                <tr><td>Maxitrol</td><td></td><td>1</td></tr>
+                                                <tr><td>Maxon</td><td></td><td>12</td></tr>
+                                                <tr><td>McCrometer</td><td></td><td>1</td></tr>
+                                                <tr><td>McDonnell & Miller</td><td>(312) 267-1600</td><td>1</td></tr>
+                                                <tr><td>McJunkin</td><td></td><td>0</td></tr>
+                                                <tr><td>McMaster Carr</td><td>(310) 692-5911</td><td>1</td></tr>
+                                                <tr><td>Mercoid</td><td>(312) 736-2100</td><td>16</td></tr>
+                                                <tr><td>Mettler Toledo</td><td></td><td>9</td></tr>
+                                                <tr><td>Micro Motion</td><td></td><td>53</td></tr>
+                                                <tr><td>Micro Switch</td><td>(800) 537-6945</td><td>2</td></tr>
+                                                <tr><td>Micromotion</td><td>(800) 522-6277</td><td>81</td></tr>
+                                                <tr><td>Mine Safety Appliance</td><td>(800) 672-2222</td><td>2</td></tr>
+                                                <tr><td>Monitek</td><td>(510) 471-8300</td><td>2</td></tr>
+                                                <tr><td>Moore Ind</td><td>(800) 999-2900</td><td>101</td></tr>
+                                                <tr><td>Moore Prod</td><td>(415) 887-5535</td><td>12</td></tr>
+                                                <tr><td>MSA</td><td></td><td>1</td></tr>
+                                                <tr><td>Murphy</td><td>(805) 272-4700</td><td>2</td></tr>
+                                                <tr><td>Neles-Jamesbury</td><td>(508) 852-0200</td><td>76</td></tr>
+                                                <tr><td>Numatics Engineering</td><td></td><td>14</td></tr>
+                                                <tr><td>Ohmart/VEGA</td><td>(513) 272-0131</td><td>114</td></tr>
+                                                <tr><td>Omega</td><td>(203) 359-1660</td><td>5</td></tr>
+                                                <tr><td>Orion Instruments</td><td>(225) 236-9946</td><td>2</td></tr>
+                                                <tr><td>Palmer</td><td>(510) 770-8522</td><td>20</td></tr>
+                                                <tr><td>PANAMETRICS</td><td></td><td>1</td></tr>
+                                                <tr><td>PDC</td><td></td><td>1</td></tr>
+                                                <tr><td>Peeco</td><td>(910) 775-3355</td><td>15</td></tr>
+                                                <tr><td>Pepperl Fuchs</td><td>(330) 425-3555</td><td>2</td></tr>
+                                                <tr><td>Posiseal</td><td>(203) 599-1140</td><td>2</td></tr>
+                                                <tr><td>Raytek</td><td></td><td>2</td></tr>
+                                                <tr><td>Research Ctrls</td><td></td><td>5</td></tr>
+                                                <tr><td>Rimcor</td><td></td><td>1</td></tr>
+                                                <tr><td>Rosemount</td><td>(800) 654-7768</td><td>270</td></tr>
+                                                <tr><td>ROTRONIC</td><td></td><td>1</td></tr>
+                                                <tr><td>SIERRA INSTRUMENTS</td><td></td><td>1</td></tr>
+                                                <tr><td>Solar Weston</td><td></td><td>75</td></tr>
+                                                <tr><td>Spence</td><td></td><td>1</td></tr>
+                                                <tr><td>Static-O-Ring</td><td>(913) 888-2630</td><td>8</td></tr>
+                                                <tr><td>Strahman</td><td></td><td>1</td></tr>
+                                                <tr><td>Taylor</td><td>(716) 292-6050</td><td>31</td></tr>
+                                                <tr><td>Teledyne</td><td>(213) 961-9221</td><td>1</td></tr>
+                                                <tr><td>Thermo Electric</td><td>(818) 765-5276</td><td>7</td></tr>
+                                                <tr><td>Thermox</td><td></td><td>5</td></tr>
+                                                <tr><td>Thomas & Betts</td><td></td><td>3</td></tr>
+                                                <tr><td>Trueline</td><td></td><td>2</td></tr>
+                                                <tr><td>Tufline</td><td>(513) 745-6000</td><td>9</td></tr>
+                                                <tr><td>United Electric</td><td>(617) 926-1000</td><td>3</td></tr>
+                                                <tr><td>Varec</td><td>(714) 761-1300</td><td>14</td></tr>
+                                                <tr><td>Veeder-Root</td><td>(203) 527-7201</td><td>3</td></tr>
+                                                <tr><td>VEGA</td><td>1 (800) 367-5383</td><td>1</td></tr>
+                                                <tr><td>Versa</td><td>(201) 843-2400</td><td>1</td></tr>
+                                                <tr><td>Westcon</td><td>(717) 354-8430</td><td>18</td></tr>
+                                                <tr><td>Westlock</td><td></td><td>1</td></tr>
+                                                <tr><td>Whitey</td><td></td><td>1</td></tr>
+                                                <tr><td>Worcester</td><td>(508) 481-4800</td><td>25</td></tr>
+                                                <tr><td>Xomox</td><td></td><td>8</td></tr>
+                                                <tr><td>Yokogawa</td><td></td><td>1</td></tr>
+                                            </tbody>
+
+
+                                        </table>
+                                    </div>
+                                </div>
+                                <div id="TemplateTab" class="tab-pane">
+                                    <div class="tab-ctn">
+                                        @*<p>this is content in menu4</p>
+                                            <p class="tab-mg-b-0">this is maincontent in menu4.</p>*@
+                                        <table id="exampleTemp" class="display" style="width:100%">
+                                            <thead>
+                                                <tr>
+                                                    <th>Seq No</th>
+                                                    <th>Instrument Type</th>
+                                                    <th>Information Type</th>
+                                                    <th>Unit</th>
+                                                    <th>Information Group</th>
+                                                    <th>Group Seq No</th>
+                                                    <th>Info Record Count</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>70</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Temp</td>
+                                                    <td>Deg F</td>
+                                                    <td>Operating Conditions</td>
+                                                    <td>20</td>
+                                                    <td>5</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>10</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Process Fluid</td>
+                                                    <td></td>
+                                                    <td>Process Fluid</td>
+                                                    <td>15</td>
+                                                    <td>5</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>170</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Specific Gravity</td>
+                                                    <td>SG</td>
+                                                    <td>Operating Conditions</td>
+                                                    <td>20</td>
+                                                    <td>5</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>190</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Viscosity</td>
+                                                    <td>cP</td>
+                                                    <td>Operating Conditions</td>
+                                                    <td>20</td>
+                                                    <td>5</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>40</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Flow</td>
+                                                    <td>Lbs/Hr</td>
+                                                    <td>Operating Conditions</td>
+                                                    <td>20</td>
+                                                    <td>5</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>100</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Inlet Press</td>
+                                                    <td>PSIG</td>
+                                                    <td>Operating Conditions</td>
+                                                    <td>20</td>
+                                                    <td>5</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>130</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Differential Press</td>
+                                                    <td>PSI</td>
+                                                    <td>Operating Conditions</td>
+                                                    <td>20</td>
+                                                    <td>5</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>160</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Cv/Cg/Cs</td>
+                                                    <td></td>
+                                                    <td>Operating Conditions</td>
+                                                    <td>20</td>
+                                                    <td>5</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>180</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Modular Weight</td>
+                                                    <td></td>
+                                                    <td>Operating Conditions</td>
+                                                    <td>20</td>
+                                                    <td>5</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>200</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Degrees of Super Heat</td>
+                                                    <td></td>
+                                                    <td>Operating Conditions</td>
+                                                    <td>20</td>
+                                                    <td>5</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>210</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Supercompressibility Factor</td>
+                                                    <td></td>
+                                                    <td>Operating Conditions</td>
+                                                    <td>20</td>
+                                                    <td>5</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>220</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Vapor Pressure</td>
+                                                    <td></td>
+                                                    <td>Operating Conditions</td>
+                                                    <td>20</td>
+                                                    <td>5</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>10</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Model No</td>
+                                                    <td></td>
+                                                    <td>Body</td>
+                                                    <td>110</td>
+                                                    <td>5</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>20</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Size/Rating</td>
+                                                    <td></td>
+                                                    <td>Body</td>
+                                                    <td>110</td>
+                                                    <td>5</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>30</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Body Type</td>
+                                                    <td></td>
+                                                    <td>Body</td>
+                                                    <td>110</td>
+                                                    <td>5</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>40</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Body Material</td>
+                                                    <td></td>
+                                                    <td>Body</td>
+                                                    <td>110</td>
+                                                    <td>5</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>60</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Packing/Seal</td>
+                                                    <td></td>
+                                                    <td>Body</td>
+                                                    <td>110</td>
+                                                    <td>5</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>110</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Shut-Off Classification</td>
+                                                    <td></td>
+                                                    <td>Body</td>
+                                                    <td>110</td>
+                                                    <td>5</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>130</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Max Sound Level</td>
+                                                    <td>dBA</td>
+                                                    <td>Body</td>
+                                                    <td>110</td>
+                                                    <td>5</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>120</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Max Shutoff Pressure</td>
+                                                    <td>PSIG</td>
+                                                    <td>Operating Conditions</td>
+                                                    <td></td>
+                                                    <td></td>
+
+                                                </tr>
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+                                </div>
+                                <div id="InstypeTab" class="tab-pane animated zoomInLeft">
+                                    <div class="tab-ctn">
+                                        @*<p>this is menu5 content</p>
+                                            <p class="tab-mg-b-0">this is maincontent in menu5</p>*@
+                                        <table id="example4" class="display" style="width:100%" responsive="scroll">
+                                            <thead>
+                                                <tr>
+                                                    <th>Instrument Type</th>
+                                                    <th>Instrument Count</th>
+                                                    <th>Instrument Template Line Count</th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>3-Way Valve</td>
+                                                    <td>6</td>
+                                                    <td>53</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Alarm</td>
+                                                    <td>25</td>
+                                                    <td>15</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Annubar</td>
+                                                    <td>4</td>
+                                                    <td>19</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Ball Valve</td>
+                                                    <td>66</td>
+                                                    <td>60</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Bulb Transmitter</td>
+                                                    <td>3</td>
+                                                    <td>21</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Butterfly Valve</td>
+                                                    <td>15</td>
+                                                    <td>59</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Conductivity Analyser</td>
+                                                    <td>1</td>
+                                                    <td>0</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>D/P Transmitter</td>
+                                                    <td>107</td>
+                                                    <td>37</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Flame Scanner</td>
+                                                    <td>3</td>
+                                                    <td>1</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Flow Indicator</td>
+                                                    <td>19</td>
+                                                    <td>23</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Flow Switch</td>
+                                                    <td>16</td>
+                                                    <td>23</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Flow Transmitter</td>
+                                                    <td>117</td>
+                                                    <td>51</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Gas Analyser</td>
+                                                    <td>18</td>
+                                                    <td>24</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Globe Valve</td>
+                                                    <td>272</td>
+                                                    <td>59</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>I/P & Misc</td>
+                                                    <td>42</td>
+                                                    <td>20</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Indicating Controller</td>
+                                                    <td>9</td>
+                                                    <td>34</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Indicator(xmtr)</td>
+                                                    <td>10</td>
+                                                    <td>16</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Level Controller</td>
+                                                    <td>9</td>
+                                                    <td>28</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Level Glass</td>
+                                                    <td>34</td>
+                                                    <td>39</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Level Indicator</td>
+                                                    <td>9</td>
+                                                    <td>28</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Level Switch</td>
+                                                    <td>48</td>
+                                                    <td>42</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Level Transmitter</td>
+                                                    <td>194</td>
+                                                    <td>46</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Misc Valve</td>
+                                                    <td>2</td>
+                                                    <td>8</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Nuclear Gage</td>
+                                                    <td>7</td>
+                                                    <td>21</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Oil in Water Analyser</td>
+                                                    <td>0</td>
+                                                    <td>22</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>On/Off Valve</td>
+                                                    <td>315</td>
+                                                    <td>56</td>
+
+                                                </tr>
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+                                </div>
+                                <div id="InfTab" class="tab-pane animated zoomInLeft">
+                                    <div class="tab-ctn">
+                                        @*<p>this is menu6 content</p>
+                                            <p class="tab-mg-b-0">this is maincontent in menu6.</p>*@
+                                        <table id="example5" class="display" style="width:100%" responsive="scroll">
+                                            <thead>
+                                                <tr>
+                                                    <th>Information Type</th>
+                                                    <th>Unit</th>
+                                                    <th>Min/Norm/Max Field</th>
+                                                    <th>Template Record Count</th>
+                                                    <th>Info Record Count</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Accessory(s)</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td>0</td>
+                                                    <td></td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Accuracy</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td>26</td>
+                                                    <td>1833</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Action</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td>11</td>
+                                                    <td>386</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Actuator Model</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td>6</td>
+                                                    <td>764</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Actuator Size</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td>6</td>
+                                                    <td>764</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Actuator Type</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td>6</td>
+                                                    <td>764</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Address</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td>0</td>
+                                                    <td></td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Adjustment</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td>2</td>
+                                                    <td>68</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Air Consumption</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td>4</td>
+                                                    <td>368</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Air Filter Regulator</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td>5</td>
+                                                    <td>681</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Air Gap to Pickup</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td>1</td>
+                                                    <td>1</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Air Supply</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td>1</td>
+                                                    <td>15</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Air Supply/Signal Connector</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td>5</td>
+                                                    <td>681</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Alarm Switches</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td>1</td>
+                                                    <td>4</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Ambient Air</td>
+                                                    <td>Deg F</td>
+                                                    <td>Yes</td>
+                                                    <td>1</td>
+                                                    <td>20</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Ambient Temp</td>
+                                                    <td>Deg F</td>
+                                                    <td>Yes</td>
+                                                    <td>1</td>
+                                                    <td>7</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Ambient Temp</td>
+                                                    <td>Deg F</td>
+                                                    <td>Yes</td>
+                                                    <td>1</td>
+                                                    <td>32</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Analog Interface</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td>1</td>
+                                                    <td>11</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>ANalyser Model</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td>1</td>
+                                                    <td>20</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Analyser Output</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td>1</td>
+                                                    <td>20</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>APM/HPM</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td>1</td>
+                                                    <td>0</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Approved By/Date</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td>0</td>
+                                                    <td></td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Backpressure Range</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td>1</td>
+                                                    <td>3</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Ball Bearings</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td>1</td>
+                                                    <td>20</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Ball Check</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td>1</td>
+                                                    <td>32</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>Ball Material</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td>1</td>
+                                                    <td>66</td>
+
+                                                </tr>
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div id="InfgrpTab" class="tab-pane">
+                                    <div class="tab-ctn">
+                                        @*<p>this is menu6 content</p>
+                                            <p class="tab-mg-b-0">this is maincontent in menu6.</p>*@
+                                        <table id="example6" class="display" style="width:100%" responsive="scroll">
+                                            <thead>
+                                                <tr>
+                                                    <th>Information Group</th>
+                                                    <th>Group Seq No</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr><td>Accessories</td><td>420</td></tr>
+                                                <tr><td>Actuator</td><td>310</td></tr>
+                                                <tr><td>Amplifier</td><td>0</td></tr>
+                                                <tr><td>Analyzer</td><td>260</td></tr>
+                                                <tr><td>Body</td><td>110</td></tr>
+                                                <tr><td>Cable</td><td>51</td></tr>
+                                                <tr><td>Case</td><td>210</td></tr>
+                                                <tr><td>Connection</td><td>320</td></tr>
+                                                <tr><td>Contacts</td><td>240</td></tr>
+                                                <tr><td>Controller</td><td>100</td></tr>
+                                                <tr><td>Diaphragm Seal</td><td>270</td></tr>
+                                                <tr><td>Displacer</td><td>360</td></tr>
+                                                <tr><td>Display</td><td>140</td></tr>
+                                                <tr><td>Drive</td><td>20</td></tr>
+                                                <tr><td>Drive Options</td><td>30</td></tr>
+                                                <tr><td>Electrical Classification</td><td>410</td></tr>
+                                                <tr><td>Element</td><td>200</td></tr>
+                                                <tr><td>Enclosure</td><td>290</td></tr>
+                                                <tr><td>Field Terminal Assembly</td><td>4</td></tr>
+                                                <tr><td>Flame Scanner</td><td>0</td></tr>
+                                                <tr><td>Flange</td><td>250</td></tr>
+                                                <tr><td>Gauge Glass</td><td>50</td></tr>
+                                                <tr><td>Gear</td><td>150</td></tr>
+                                                <tr><td>I/P</td><td>370</td></tr>
+                                                <tr><td>Indicator</td><td>170</td></tr>
+                                                <tr><td>Input Output Processor</td><td>3</td></tr>
+                                                <tr><td>Ins</td><td></td></tr>
+                                                <tr><td>Isolation Transformer</td><td>10</td></tr>
+                                                <tr><td>Line Reactor</td><td>31</td></tr>
+                                                <tr><td>Location</td><td>2</td></tr>
+                                                <tr><td>Magnetic Pickup</td><td>120</td></tr>
+                                                <tr><td>Manifold</td><td>25</td></tr>
+                                                <tr><td>Materials</td><td>380</td></tr>
+                                                <tr><td>Metering Tube</td><td>60</td></tr>
+                                                <tr><td>Miscellaneous</td><td>230</td></tr>
+                                                <tr><td>Notes</td><td>430</td></tr>
+                                                <tr><td>Operating Conditions</td><td>20</td></tr>
+                                                <tr><td>Orifice</td><td>80</td></tr>
+                                                <tr><td>Piping Requirements</td><td>180</td></tr>
+                                                <tr><td>Positioner</td><td>390</td></tr>
+                                                <tr><td>Power Adapter</td><td>5</td></tr>
+                                                <tr><td>Pre-Amp</td><td>400</td></tr>
+                                                <tr><td>Process Fluid</td><td>15</td></tr>
+                                                <tr><td>Relay</td><td>70</td></tr>
+                                                <tr><td>Sensor</td><td>220</td></tr>
+                                                <tr><td>Solenoid Valve</td><td>350</td></tr>
+                                                <tr><td>Source</td><td>130</td></tr>
+                                                <tr><td>Spool Piece</td><td>300</td></tr>
+                                                <tr><td>Switch</td><td>160</td></tr>
+                                                <tr><td>Thermocouple</td><td>10</td></tr>
+                                                <tr><td>Thermowell</td><td>330</td></tr>
+                                                <tr><td>Transducer</td><td>30</td></tr>
+                                                <tr><td>Transmitter</td><td>190</td></tr>
+                                                <tr><td>Trim</td><td>280</td></tr>
+                                                <tr><td>Unit</td><td>40</td></tr>
+                                                <tr><td>Valves</td><td>90</td></tr>
+
+                                            </tbody>
+                                        </table>
+
+                                    </div>
+                                </div>
+                                <div id="LoopTab" class="tab-pane animated zoomInLeft">
+                                    <div class="tab-ctn">
+                                        @*<p>this is menu6 content</p>
+                                            <p class="tab-mg-b-0">this is maincontent in menu6.</p>*@
+                                        <table id="example7" class="display" style="width:100%">
+                                            <thead>
+                                                <tr>
+                                                    <th>Seq No</th>
+                                                    <th>Instrument Type</th>
+                                                    <th>Information Type</th>
+                                                    <th>Unit</th>
+                                                    <th>Information Group</th>
+                                                    <th>Group Seq No</th>
+                                                    <th>Info Record Count</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>70</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Temp</td>
+                                                    <td>Deg F</td>
+                                                    <td>Operating Conditions</td>
+                                                    <td>20</td>
+                                                    <td>5</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>10</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Process Fluid</td>
+                                                    <td></td>
+                                                    <td>Process Fluid</td>
+                                                    <td>15</td>
+                                                    <td>5</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>170</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Specific Gravity</td>
+                                                    <td>SG</td>
+                                                    <td>Operating Conditions</td>
+                                                    <td>20</td>
+                                                    <td>5</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>190</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Viscosity</td>
+                                                    <td>cP</td>
+                                                    <td>Operating Conditions</td>
+                                                    <td>20</td>
+                                                    <td>5</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>40</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Flow</td>
+                                                    <td>Lbs/Hr</td>
+                                                    <td>Operating Conditions</td>
+                                                    <td>20</td>
+                                                    <td>5</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>100</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Inlet Press</td>
+                                                    <td>PSIG</td>
+                                                    <td>Operating Conditions</td>
+                                                    <td>20</td>
+                                                    <td>5</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>130</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Differential Press</td>
+                                                    <td>PSI</td>
+                                                    <td>Operating Conditions</td>
+                                                    <td>20</td>
+                                                    <td>5</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>160</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Cv/Cg/Cs</td>
+                                                    <td></td>
+                                                    <td>Operating Conditions</td>
+                                                    <td>20</td>
+                                                    <td>5</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>180</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Modular Weight</td>
+                                                    <td></td>
+                                                    <td>Operating Conditions</td>
+                                                    <td>20</td>
+                                                    <td>5</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>200</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Degrees of Super Heat</td>
+                                                    <td></td>
+                                                    <td>Operating Conditions</td>
+                                                    <td>20</td>
+                                                    <td>5</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>210</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Supercompressibility Factor</td>
+                                                    <td></td>
+                                                    <td>Operating Conditions</td>
+                                                    <td>20</td>
+                                                    <td>5</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>220</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Vapor Pressure</td>
+                                                    <td></td>
+                                                    <td>Operating Conditions</td>
+                                                    <td>20</td>
+                                                    <td>5</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>10</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Model No</td>
+                                                    <td></td>
+                                                    <td>Body</td>
+                                                    <td>110</td>
+                                                    <td>5</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>20</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Size/Rating</td>
+                                                    <td></td>
+                                                    <td>Body</td>
+                                                    <td>110</td>
+                                                    <td>5</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>30</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Body Type</td>
+                                                    <td></td>
+                                                    <td>Body</td>
+                                                    <td>110</td>
+                                                    <td>5</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>40</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Body Material</td>
+                                                    <td></td>
+                                                    <td>Body</td>
+                                                    <td>110</td>
+                                                    <td>5</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>60</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Packing/Seal</td>
+                                                    <td></td>
+                                                    <td>Body</td>
+                                                    <td>110</td>
+                                                    <td>5</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>110</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Shut-Off Classification</td>
+                                                    <td></td>
+                                                    <td>Body</td>
+                                                    <td>110</td>
+                                                    <td>5</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>130</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Max Sound Level</td>
+                                                    <td>dBA</td>
+                                                    <td>Body</td>
+                                                    <td>110</td>
+                                                    <td>5</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>120</td>
+                                                    <td>3-Way Valve</td>
+                                                    <td>Max Shutoff Pressure</td>
+                                                    <td>PSIG</td>
+                                                    <td>Operating Conditions</td>
+                                                    <td></td>
+                                                    <td></td>
+
+                                                </tr>
+                                            </tbody>
+
+                                        </table>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

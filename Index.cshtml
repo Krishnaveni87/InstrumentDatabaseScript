@@ -1,0 +1,25 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+<link href="~/Content/CustomCSS/Custom.css" rel="stylesheet" />
+<title>
+    P&G
+</title>
+<body >
+    <div class="indexbody">
+        <div id="frozen-btn" style="align-content:center">
+            <img class="imgstyle" src="~/Images/pgsvg.svg" alt="" style="width:60px"/>
+           
+            <div class="btn_home">
+                <button class="green" onclick="window.location.href='../Home/TabsOverview';"></button>
+                <button class="purple" onclick="window.location.href='../Home/Equipment';"></button>
+                <button class="blue" onclick="window.location.href='../Home/Instrument';"></button>
+            </div>
+            <div class="btn_hometext">
+                <label class="home_text">Instrument Database</label>
+                <label class="home_text">Equipment Number Generating System</label>
+                <label class="home_text">Instrument Number Generating System</label>
+            </div>
+        </div>
+        </div>
+</body>

@@ -1,0 +1,2783 @@
+﻿
+@using System.Data
+@model DataSet
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Instrument Database</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,700,900" rel="stylesheet">
+    <link href="../../Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="../../Content/font-awesome.min.css" rel="stylesheet" />
+    <link href="../../Content/owl.carousel.css" rel="stylesheet" />
+    <link href="../../Content/owl.theme.css" rel="stylesheet" />
+    <link href="~/Content/meanmenu.min.css" rel="stylesheet" />
+    <link href="~/Content/jquery.mCustomScrollbar.min.css" rel="stylesheet" />
+    <link href="~/Content/animate.min.css" rel="stylesheet" />
+    <link href="~/Content/normalize.css" rel="stylesheet" />
+    <link href="~/Content/waves.min.css" rel="stylesheet" />
+    <link href="~/Content/button.css" rel="stylesheet" />
+    <link href="~/Content/main.css" rel="stylesheet" />
+    <link href="~/Content/style.css" rel="stylesheet" />
+    <link href="~/Content/responsee.css" rel="stylesheet" />
+    <script src="~/Scripts/modernizr-2.8.3.js"></script>
+    <link rel="stylesheet" href="../../Content/jquery.dataTables.min.css" />
+
+
+
+
+    @*<link href="../../Content/fixedHeader.dataTables.css" rel="stylesheet" />*@
+
+    @*<link rel="stylesheet" href="~/Views/Home/HomeStyle.css">*@
+
+    <script src="../../Scripts/jquery-3.5.1.js"></script>
+    <script src="../../Scripts/jquery.dataTables.min.js" defer></script>
+    @*<script src="../../Scripts/dataTables.fixedHeader.min.js"></script>*@
+
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+    @*<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.24/datatables.min.css" />
+
+        <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.24/datatables.min.js"></script>
+
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedcolumns/3.3.0/css/fixedColumns.dataTables.css">
+
+        <script type="text/javascript" src="https://cdn.datatables.net/fixedcolumns/3.3.0/js/dataTables.fixedColumns.js"></script>
+
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.24/sc-2.0.3/datatables.min.css" />
+
+        <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.24/sc-2.0.3/datatables.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.24/fc-3.3.2/r-2.2.7/datatables.min.css" />
+
+        <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.24/fc-3.3.2/r-2.2.7/datatables.min.js"></script>*@
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+    <link rel="stylesheet" href="~/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="~/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+
+
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+
+
+            var table = $('#example').DataTable({
+                orderCellsTop: true,
+                fixedHeader: true,
+                scrollY: 370,
+                order: [],
+                scrollX: true,
+                paging: false,
+                autowidth: false,
+                pageLength: false,
+                bInfo: false,
+                responsive: true
+
+
+
+            });
+        });
+        $(document).ready(function () {
+            populateTable(document.getElementById('example1'), getData());
+            $('#example1').DataTable({
+                orderCellsTop: true,
+                order: [],
+                paging: false,
+                autowidth: false,
+                pageLength: false,
+                bInfo: false,
+                responsive: true
+
+            });
+        });
+
+
+        $(document).ready(function () {
+            populateTable(document.getElementById('example3'), getData2());
+            $('#example3').DataTable({
+                orderCellsTop: true,
+                order: [],
+                paging: false,
+                autowidth: false,
+                pageLength: false,
+                bInfo: false,
+                fixedHeader: true
+
+
+
+            });
+
+        });
+
+        $(document).ready(function () {
+            populateTable(document.getElementById('example2'), getDataone);
+            $('#example2').DataTable({
+                orderCellsTop: true,
+                order: [],
+                paging: false,
+                autowidth: true,
+                pageLength: false,
+                bInfo: false,
+                responsive: true
+
+            });
+        });
+
+
+
+        function dataFields(data) {
+            return data.reduce((r, x) => Object.keys(x).reduce((s, k) => s.indexOf(k) === -1 ? s.concat(k) : s, r), []);
+        }
+
+        /* Can be useful if working with raw JSON data */
+        function searchCriteria(fields) {
+            return Array.from(fields).reduce((o, field) => {
+                return Object.assign(o, { [field.getAttribute('placeholder')]: field.value });
+            }, {});
+        }
+
+        function onFilter(e) {
+            var table = e.target.parentElement.parentElement.parentElement.parentElement;
+            /*console.log(table);*/
+            var fields = table.querySelectorAll('thead tr th input');
+            /*  console.log(fields);*/
+            var searchText = Array.from(fields).map(function (field) {
+                return field.value.trim();
+            });
+            /* console.log(searchText);*/
+            Array.from(table.querySelectorAll('tbody tr')).forEach(function (row) {
+                var hideRow = false;
+                Array.from(row.children).forEach(function (col, index) {
+                    var value = col.innerHTML.trim().toLowerCase();
+                    console.log(value);
+                    var search = searchText[index].toLowerCase();
+                    console.log(search);
+                    if (search.length > 0) {
+                        if (value.indexOf(search) === -1) {
+                            hideRow = true;
+                            return;
+                        }
+                    }
+                });
+                row.classList.toggle('hidden-row', hideRow);
+            });
+        }
+
+        function populateTable(table, data) {
+            let fields = dataFields(data);
+            let thead = document.createElement('THEAD');
+            let tr = document.createElement('TR');
+            fields.forEach(field => {
+                let th = document.createElement('TH');
+                th.innerHTML = field;
+                tr.appendChild(th);
+            });
+            thead.appendChild(tr);
+            let tbody = document.createElement('TBODY');
+            tr = document.createElement('TR');
+            fields.forEach(field => {
+                let th = document.createElement('TH');
+                let input = document.createElement('INPUT');
+                /*input.setAttribute('placeholder', field);*/
+                input.addEventListener('keyup', onFilter);
+                th.append(input);
+                tr.appendChild(th);
+            });
+            thead.appendChild(tr);
+            data.forEach(record => {
+                let tr = document.createElement('TR');
+                fields.forEach(field => {
+                    let td = document.createElement('TD');
+                    td.innerHTML = record[field];
+                    tr.appendChild(td);
+                });
+                tbody.append(tr);
+            });
+            table.appendChild(thead);
+            table.appendChild(tbody);
+        }
+
+
+
+
+        function getData() {
+            return [
+                {
+                    "Instrument Type": "Level Transmitter",
+                    "TagName": "1614",
+                    "Loop No": 1614,
+                    "Description": "TANK 410 ESTER STORAGE TANK",
+                    "Type": "Radar Level transmitter",
+                    "Area": "Tank Farm",
+                    "P&ID No": "C-451675",
+                    "Model No": "",
+                    "Needs Updating": "no",
+                    "Spec Info": ""
+                },
+                {
+                    "Instrument Type": "Pressure Transmitter",
+                    "TagName": "5377",
+                    "Loop No": 5377,
+                    "Description": "Tank 407 Nitrogen Pressure",
+                    "Type": "Guage Pressure Transmitter",
+                    "Area": "Tank Farm",
+                    "P&ID No": "C-451679",
+                    "Model No": "3051CG1A",
+                    "Needs Updating": "no",
+                    "Spec Info": ""
+                },
+                {
+                    "Instrument Type": "Level Transmitter",
+                    "TagName": "9004",
+                    "Loop No": 9004,
+                    "Description": "TANK 402 ESTER STORAGE TANK",
+                    "Type": "Radar Level transmitter",
+                    "Area": "Tank Farm",
+                    "P&ID No": "C-451675",
+                    "Model No": "",
+                    "Needs Updating": "no",
+                    "Spec Info": ""
+                },
+                {
+                    "Instrument Type": "On/Off Valve",
+                    "TagName": "9359",
+                    "Loop No": 9359,
+                    "Description": "TANK 411 INLET LINE-1 ON/OFF VALVE",
+                    "Type": "",
+                    "Area": "Tank Farm",
+                    "P&ID No": "C-451675",
+                    "Model No": "",
+                    "Needs Updating": "no",
+                    "Spec Info": ""
+                },
+                {
+                    "Instrument Type": "pH Analyzer",
+                    "TagName": "AE/AIT0000",
+                    "Loop No": 0,
+                    "Description": "",
+                    "Type": "",
+                    "Area": "",
+                    "P&ID No": "",
+                    "Model No": "",
+                    "Needs Updating": "no",
+                    "Spec Info": ""
+                },
+                {
+                    "Instrument Type": "pH Analyzer",
+                    "TagName": "AE/AT2942",
+                    "Loop No": 2942,
+                    "Description": "N. FAT TRAP DISCH pH",
+                    "Type": "",
+                    "Area": "Refinery",
+                    "P&ID No": "C-463545",
+                    "Model No": "",
+                    "Needs Updating": "no",
+                    "Spec Info": ""
+                },
+                {
+                    "Instrument Type": "Gas Analyzer",
+                    "TagName": "AI2761",
+                    "Loop No": 2761,
+                    "Description": "DOWTHERM EXHAUST O2 PROBE #2",
+                    "Type": "",
+                    "Area": "HFA",
+                    "P&ID No": "C-338736",
+                    "Model No": "",
+                    "Needs Updating": "no",
+                    "Spec Info": ""
+                },
+                {
+                    "Instrument Type": "Gas Analyzer",
+                    "TagName": "AIT-6172",
+                    "Loop No": 6172,
+                    "Description": "O2 Analyser From N. HFA Sensor #2",
+                    "Type": "",
+                    "Area": "HFA",
+                    "P&ID No": "CN-3412194",
+                    "Model No": "FX-SMT Series",
+                    "Needs Updating": "no",
+                    "Spec Info": ""
+                },
+                {
+                    "Instrument Type": "Opacity Glass",
+                    "TagName": "AIT/AE1211",
+                    "Loop No": 1211,
+                    "Description": "OVHDS CLARITY AFTER FILTER",
+                    "Type": "",
+                    "Area": "HFA",
+                    "P&ID No": "CN-2168",
+                    "Model No": "",
+                    "Needs Updating": "no",
+                    "Spec Info": ""
+                },
+                {
+                    "Instrument Type": "Globe Valve",
+                    "TagName": "AV-6431",
+                    "Loop No": 6431,
+                    "Description": "Nitrogen Flow To Distalltion Header Vent Line",
+                    "Type": "1 1/2\" EZ GLOBE VALVE TYPE 667",
+                    "Area": "HFA",
+                    "P&ID No": "CN-3412194",
+                    "Model No": "",
+                    "Needs Updating": "no",
+                    "Spec Info": ""
+                },
+                {
+                    "Instrument Type": "Flame Scanner",
+                    "TagName": "BE-9093",
+                    "Loop No": 9093,
+                    "Description": "Flame Scanner N. Hydrogen Heater",
+                    "Type": "Ultra violet detector",
+                    "Area": "HFA",
+                    "P&ID No": "C-613367",
+                    "Model No": "C7012C",
+                    "Needs Updating": "no",
+                    "Spec Info": ""
+                },
+                {
+                    "Instrument Type": "Vortex & Turbine Meter",
+                    "TagName": "FE/FT1143",
+                    "Loop No": 1143,
+                    "Description": "STEAM TO LCFA STRIPPER",
+                    "Type": "",
+                    "Area": "Fatty Acid",
+                    "P&ID No": "CN-1034",
+                    "Model No": "YEWFLO YF115-NNNA3A-S3S3 C/FMF/SCT W/ CONVERTER (S",
+                    "Needs Updating": "no",
+                    "Spec Info": ""
+                },
+                {
+                    "Instrument Type": "Flow Transmitter",
+                    "TagName": "FE/FT1340",
+                    "Loop No": 1340,
+                    "Description": "Surge Tank Make-up Flow",
+                    "Type": "",
+                    "Area": "BoilerHouse",
+                    "P&ID No": "SAC-T-1200",
+                    "Model No": "",
+                    "Needs Updating": "no",
+                    "Spec Info": ""
+                },
+                {
+                    "Instrument Type": "Flow Transmitter",
+                    "TagName": "FE/FT1809",
+                    "Loop No": 1809,
+                    "Description": "ITE STILL FEED",
+                    "Type": "MASS FLOW METER",
+                    "Area": "HFA",
+                    "P&ID No": "CN-S342",
+                    "Model No": "",
+                    "Needs Updating": "no",
+                    "Spec Info": ""
+                },
+                {
+                    "Instrument Type": "Annubar",
+                    "TagName": "FE8102A",
+                    "Loop No": 8102,
+                    "Description": "DRY FEED TO DRYERS",
+                    "Type": "ANNUBAR PITOT TUBE",
+                    "Area": "Refinery",
+                    "P&ID No": "CN-8427",
+                    "Model No": "65M1001-8\"-2B15M",
+                    "Needs Updating": "no",
+                    "Spec Info": ""
+                },
+                {
+                    "Instrument Type": "Flow Indicator",
+                    "TagName": "FI5606",
+                    "Loop No": 5606,
+                    "Description": "Ester Blend Feed Flow Indicator",
+                    "Type": "",
+                    "Area": "",
+                    "P&ID No": "",
+                    "Model No": "",
+                    "Needs Updating": "no",
+                    "Spec Info": ""
+                },
+                {
+                    "Instrument Type": "Totalizer",
+                    "TagName": "FQIC8503",
+                    "Loop No": 8503,
+                    "Description": "MOTT FILTER FEED",
+                    "Type": "TOTALIZING CONTROLLER",
+                    "Area": "HFA",
+                    "P&ID No": "CN-2138",
+                    "Model No": "790705-141",
+                    "Needs Updating": "no",
+                    "Spec Info": ""
+                },
+                {
+                    "Instrument Type": "Flow Switch",
+                    "TagName": "FSH-2998",
+                    "Loop No": 2998,
+                    "Description": "REFINERY SAFETY SHOWERS ACTIVATION",
+                    "Type": "",
+                    "Area": "Ester Making",
+                    "P&ID No": "C-459088",
+                    "Model No": "",
+                    "Needs Updating": "no",
+                    "Spec Info": ""
+                },
+                {
+                    "Instrument Type": "Globe Valve",
+                    "TagName": "FV/FY8548",
+                    "Loop No": 8548,
+                    "Description": "OVERHEADS FILTER FEED",
+                    "Type": "",
+                    "Area": "",
+                    "P&ID No": "CN-2213",
+                    "Model No": "1\" EZ",
+                    "Needs Updating": "no",
+                    "Spec Info": ""
+                },
+                {
+                    "Instrument Type": "Ball Valve",
+                    "TagName": "FV8692",
+                    "Loop No": 8692,
+                    "Description": "ESTER TO SETTLER #1 Fire Isolation Valve",
+                    "Type": "4\" BALL VALVE",
+                    "Area": "Refinery",
+                    "P&ID No": "CN-2181",
+                    "Model No": "4-5150-31-2236MT",
+                    "Needs Updating": "no",
+                    "Spec Info": ""
+                },
+                {
+                    "Instrument Type": "Solenoid Valve",
+                    "TagName": "FY1826",
+                    "Loop No": 1826,
+                    "Description": "VAPOR BLOCK VALVES",
+                    "Type": "SOLENOID VALVE",
+                    "Area": "HFA",
+                    "P&ID No": "CN-S342",
+                    "Model No": "8316",
+                    "Needs Updating": "no",
+                    "Spec Info": ""
+                },
+                {
+                    "Instrument Type": "Level Glass",
+                    "TagName": "LG8485",
+                    "Loop No": 8485,
+                    "Description": "H2 RECYCLE SEPARATOR",
+                    "Type": "REFLEX LEVEL GAUGE GLASS",
+                    "Area": "HFA",
+                    "P&ID No": "C-745196",
+                    "Model No": "19-R-20",
+                    "Needs Updating": "no",
+                    "Spec Info": ""
+                },
+                {
+                    "Instrument Type": "Indicator (xmtr)",
+                    "TagName": "LI0000A",
+                    "Loop No": 0,
+                    "Description": "Standard Loop Powered Indicator (Level)",
+                    "Type": "Local 4-20mA transducer",
+                    "Area": "",
+                    "P&ID No": "",
+                    "Model No": "751",
+                    "Needs Updating": "no",
+                    "Spec Info": ""
+                },
+                {
+                    "Instrument Type": "I/P & Misc",
+                    "TagName": "LY8154",
+                    "Loop No": 8154,
+                    "Description": "ESTER FLASH CONDENSATE LEVEL",
+                    "Type": "I/P TRANSDUCER/POSITIONER",
+                    "Area": "Refinery",
+                    "P&ID No": "CN-7097",
+                    "Model No": "3590-1",
+                    "Needs Updating": "no",
+                    "Spec Info": ""
+                },
+                {
+                    "Instrument Type": "Pressure Indicator",
+                    "TagName": "PI1282",
+                    "Loop No": 1282,
+                    "Description": "LCFA WASH COL BOTTOMS HOT FEED TO STRPR",
+                    "Type": "0-60 PSI PRESS GAUGE",
+                    "Area": "Fatty Acid",
+                    "P&ID No": "CN-1034",
+                    "Model No": "45-1279-SS-04L-XOSPDNH-0/60PSI",
+                    "Needs Updating": "no",
+                    "Spec Info": ""
+                }
+            ];
+        }
+
+        var getDataone =
+
+            [
+                {
+                    "Vendor": "*",
+                    "Phone No": "",
+                    "Contact": "",
+                    "Instrument Count": 5
+                },
+                {
+                    "Vendor": "A&A",
+                    "Phone No": "(713) 938-4270",
+                    "Contact": "",
+                    "Instrument Count": 2
+                },
+                {
+                    "Vendor": "Advanced Control Solutions",
+                    "Phone No": "(510) 262-1882",
+                    "Contact": "Paul Mahoney",
+                    "Instrument Count": 29
+                },
+                {
+                    "Vendor": "APC",
+                    "Phone No": "(925) 846-9000",
+                    "Contact": "Dave Kandel",
+                    "Instrument Count": 1267
+                },
+                {
+                    "Vendor": "Assoc. Flow Ctrls",
+                    "Phone No": "(510) 820-1216",
+                    "Contact": "Jay",
+                    "Instrument Count": 1
+                },
+                {
+                    "Vendor": "Automation Prod",
+                    "Phone No": "(713) 869-0361",
+                    "Contact": "Steve Sawyer",
+                    "Instrument Count": 9
+                },
+                {
+                    "Vendor": "Automation Service",
+                    "Phone No": "",
+                    "Contact": "",
+                    "Instrument Count": 4
+                },
+                {
+                    "Vendor": "BAKER FURNACE",
+                    "Phone No": "",
+                    "Contact": "",
+                    "Instrument Count": 1
+                },
+                {
+                    "Vendor": "Bearing Supply",
+                    "Phone No": "(916) 443-4816",
+                    "Contact": "",
+                    "Instrument Count": 2
+                },
+                {
+                    "Vendor": "Belilove",
+                    "Phone No": "(510) 658-9011",
+                    "Contact": "Peter Rothermel",
+                    "Instrument Count": 72
+                },
+                {
+                    "Vendor": "Berindsen",
+                    "Phone No": "(916) 372-0550",
+                    "Contact": "",
+                    "Instrument Count": 1
+                },
+                {
+                    "Vendor": "Buringurd",
+                    "Phone No": "(707) 486-2490",
+                    "Contact": "",
+                    "Instrument Count": 41
+                },
+                {
+                    "Vendor": "Burling Inst",
+                    "Phone No": "(201) 635-9481",
+                    "Contact": "",
+                    "Instrument Count": 6
+                },
+                {
+                    "Vendor": "Burns",
+                    "Phone No": "(800) 328-3871",
+                    "Contact": "Judy",
+                    "Instrument Count": 254
+                },
+                {
+                    "Vendor": "Cal Pacific",
+                    "Phone No": "(510) 527-6728",
+                    "Contact": "",
+                    "Instrument Count": 9
+                },
+                {
+                    "Vendor": "California Hydronics Corp.",
+                    "Phone No": "(510) 293-1993",
+                    "Contact": "",
+                    "Instrument Count": 1
+                },
+                {
+                    "Vendor": "Caltrol",
+                    "Phone No": "",
+                    "Contact": "",
+                    "Instrument Count": 49
+                },
+                {
+                    "Vendor": "Catawissa",
+                    "Phone No": "(717) 356-2311",
+                    "Contact": "Patricia Wondoloski",
+                    "Instrument Count": 1
+                },
+                {
+                    "Vendor": "Cfm",
+                    "Phone No": "(510) 370-1500",
+                    "Contact": "",
+                    "Instrument Count": 4
+                },
+                {
+                    "Vendor": "Christi-Machine",
+                    "Phone No": "(916) 631-0917",
+                    "Contact": "Fred Finsterbusch",
+                    "Instrument Count": 4
+                },
+                {
+                    "Vendor": "Clipper Controls",
+                    "Phone No": "",
+                    "Contact": "",
+                    "Instrument Count": 1
+                },
+                {
+                    "Vendor": "Colesco",
+                    "Phone No": "(513) 489-1122",
+                    "Contact": "Harold or Steve",
+                    "Instrument Count": 3
+                },
+                {
+                    "Vendor": "Control Specialties",
+                    "Phone No": "",
+                    "Contact": "",
+                    "Instrument Count": 75
+                },
+                {
+                    "Vendor": "Controlco",
+                    "Phone No": "(916) 927-5599",
+                    "Contact": "",
+                    "Instrument Count": 38
+                },
+                {
+                    "Vendor": "Controltech",
+                    "Phone No": "(916) 922-9367",
+                    "Contact": "",
+                    "Instrument Count": 4
+                },
+                {
+                    "Vendor": "Crane",
+                    "Phone No": "(815) 727-2600",
+                    "Contact": "Lillian",
+                    "Instrument Count": 5
+                },
+                {
+                    "Vendor": "Daniel",
+                    "Phone No": "",
+                    "Contact": "",
+                    "Instrument Count": 6
+                },
+                {
+                    "Vendor": "Duhig",
+                    "Phone No": "",
+                    "Contact": "",
+                    "Instrument Count": 4
+                },
+                {
+                    "Vendor": "Dwyer",
+                    "Phone No": "",
+                    "Contact": "",
+                    "Instrument Count": 3
+                },
+                {
+                    "Vendor": "Dynalco",
+                    "Phone No": "(305) 739-4300",
+                    "Contact": "",
+                    "Instrument Count": 7
+                },
+                {
+                    "Vendor": "Emerson",
+                    "Phone No": "",
+                    "Contact": "",
+                    "Instrument Count": 25
+                },
+                {
+                    "Vendor": "Emerson Rosemount",
+                    "Phone No": "",
+                    "Contact": "",
+                    "Instrument Count": 2
+                },
+                {
+                    "Vendor": "Flo-Con",
+                    "Phone No": "(510) 521-5000",
+                    "Contact": "Charles Waters",
+                    "Instrument Count": 1
+                },
+                {
+                    "Vendor": "Flomax Prod",
+                    "Phone No": "(510) 449-5900",
+                    "Contact": "Jerry Morgenroth",
+                    "Instrument Count": 18
+                },
+                {
+                    "Vendor": "Flow Technology",
+                    "Phone No": "(602) 437-1315",
+                    "Contact": "",
+                    "Instrument Count": 14
+                },
+                {
+                    "Vendor": "Flw",
+                    "Phone No": "(510) 651-6511",
+                    "Contact": "",
+                    "Instrument Count": 18
+                },
+                {
+                    "Vendor": "Frank A Olsen",
+                    "Phone No": "(510) 839-5442",
+                    "Contact": "",
+                    "Instrument Count": 2
+                },
+                {
+                    "Vendor": "G.M. Cooke Assoc",
+                    "Phone No": "(510) 676-0783",
+                    "Contact": "",
+                    "Instrument Count": 2
+                },
+                {
+                    "Vendor": "Gayesco",
+                    "Phone No": "(800) 235-2540",
+                    "Contact": "Tim Mclaughlin",
+                    "Instrument Count": 11
+                },
+                {
+                    "Vendor": "General Process Controls",
+                    "Phone No": "(916) 353-1507",
+                    "Contact": "Dave Peterson",
+                    "Instrument Count": 20
+                },
+                {
+                    "Vendor": "Graybar",
+                    "Phone No": "",
+                    "Contact": "",
+                    "Instrument Count": 3
+                },
+                {
+                    "Vendor": "H2 Scan",
+                    "Phone No": "",
+                    "Contact": "",
+                    "Instrument Count": 7
+                },
+                {
+                    "Vendor": "Hammel Dahl",
+                    "Phone No": "(508) 852-0200",
+                    "Contact": "Ed Cassidy",
+                    "Instrument Count": 7
+                },
+                {
+                    "Vendor": "Hill & Watson",
+                    "Phone No": "",
+                    "Contact": "",
+                    "Instrument Count": 79
+                },
+                {
+                    "Vendor": "Hoerbiger",
+                    "Phone No": "(805) 257-2888",
+                    "Contact": "Jerry Hubner",
+                    "Instrument Count": 1
+                },
+                {
+                    "Vendor": "Honeywell",
+                    "Phone No": "(916) 923-7805",
+                    "Contact": "",
+                    "Instrument Count": 228
+                },
+                {
+                    "Vendor": "Hydro-Thermal",
+                    "Phone No": "",
+                    "Contact": "",
+                    "Instrument Count": 1
+                },
+                {
+                    "Vendor": "J&B",
+                    "Phone No": "(510) 866-1515",
+                    "Contact": "Bill Warfield",
+                    "Instrument Count": 2
+                },
+                {
+                    "Vendor": "James Murray & Assoc",
+                    "Phone No": "(513) 574-8500",
+                    "Contact": "",
+                    "Instrument Count": 1
+                },
+                {
+                    "Vendor": "Jensen Instr Co",
+                    "Phone No": "(415) 589-9720",
+                    "Contact": "",
+                    "Instrument Count": 13
+                },
+                {
+                    "Vendor": "Johnson Ctrls",
+                    "Phone No": "(916) 635-6699",
+                    "Contact": "Mark Prioletta",
+                    "Instrument Count": 5
+                },
+                {
+                    "Vendor": "Katz Controls",
+                    "Phone No": "(408) 725-8671",
+                    "Contact": "Sam Katz",
+                    "Instrument Count": 1
+                },
+                {
+                    "Vendor": "Kele",
+                    "Phone No": "",
+                    "Contact": "",
+                    "Instrument Count": 0
+                },
+                {
+                    "Vendor": "L",
+                    "Phone No": "",
+                    "Contact": "",
+                    "Instrument Count": 1
+                },
+                {
+                    "Vendor": "Linden systems",
+                    "Phone No": "",
+                    "Contact": "",
+                    "Instrument Count": 14
+                },
+                {
+                    "Vendor": "M.L.Johnson",
+                    "Phone No": "(513) 874-8445",
+                    "Contact": "",
+                    "Instrument Count": 1
+                },
+                {
+                    "Vendor": "Mac Tech",
+                    "Phone No": "(510) 632-2000",
+                    "Contact": "Charles Feltman",
+                    "Instrument Count": 3
+                },
+                {
+                    "Vendor": "Magnatrol",
+                    "Phone No": "",
+                    "Contact": "",
+                    "Instrument Count": 2
+                },
+                {
+                    "Vendor": "McJUNKIN",
+                    "Phone No": "",
+                    "Contact": "",
+                    "Instrument Count": 26
+                },
+                {
+                    "Vendor": "McJUNKINRedman",
+                    "Phone No": "",
+                    "Contact": "",
+                    "Instrument Count": 5
+                },
+                {
+                    "Vendor": "McMaster Carr",
+                    "Phone No": "(310) 692-5911 x2",
+                    "Contact": "Rose",
+                    "Instrument Count": 1
+                },
+                {
+                    "Vendor": "MCR Technologies",
+                    "Phone No": "",
+                    "Contact": "",
+                    "Instrument Count": 3
+                },
+                {
+                    "Vendor": "Micromotion",
+                    "Phone No": "(925) 362-4091",
+                    "Contact": "Dave Schratz",
+                    "Instrument Count": 68
+                },
+                {
+                    "Vendor": "Milligan Spika Co",
+                    "Phone No": "(510) 562-6667",
+                    "Contact": "Rachel Haburjak",
+                    "Instrument Count": 4
+                },
+                {
+                    "Vendor": "Mine Safety Appliance",
+                    "Phone No": "(805) 581-1919",
+                    "Contact": "Ron Devlin",
+                    "Instrument Count": 2
+                },
+                {
+                    "Vendor": "Monitek",
+                    "Phone No": "",
+                    "Contact": "",
+                    "Instrument Count": 1
+                },
+                {
+                    "Vendor": "Moore Prod",
+                    "Phone No": "(415) 887-5535",
+                    "Contact": "J. Richard Shand",
+                    "Instrument Count": 12
+                },
+                {
+                    "Vendor": "Motion Industries",
+                    "Phone No": "(916) 455-1990",
+                    "Contact": "John",
+                    "Instrument Count": 8
+                },
+                {
+                    "Vendor": "MRC Global",
+                    "Phone No": "(661) 332-0654",
+                    "Contact": "Cameron Barker",
+                    "Instrument Count": 24
+                },
+                {
+                    "Vendor": "MSA",
+                    "Phone No": "",
+                    "Contact": "",
+                    "Instrument Count": 0
+                },
+                {
+                    "Vendor": "Numatics Engineering",
+                    "Phone No": "",
+                    "Contact": "",
+                    "Instrument Count": 14
+                },
+                {
+                    "Vendor": "Oakland Valve and Fitting",
+                    "Phone No": "",
+                    "Contact": "",
+                    "Instrument Count": 1
+                },
+                {
+                    "Vendor": "Ohmart",
+                    "Phone No": "(513) 272-0131",
+                    "Contact": "Jerry",
+                    "Instrument Count": 70
+                },
+                {
+                    "Vendor": "Omega",
+                    "Phone No": "(203) 359-1660",
+                    "Contact": "",
+                    "Instrument Count": 5
+                },
+                {
+                    "Vendor": "Palmer",
+                    "Phone No": "(510) 770-8522",
+                    "Contact": "Bob Dickerson",
+                    "Instrument Count": 20
+                },
+                {
+                    "Vendor": "PANAMETRICS",
+                    "Phone No": "",
+                    "Contact": "",
+                    "Instrument Count": 1
+                },
+                {
+                    "Vendor": "Parker Supply Company",
+                    "Phone No": "(323) 268-3581",
+                    "Contact": "Debbie Miller",
+                    "Instrument Count": 1
+                },
+                {
+                    "Vendor": "Phoenix Eq Co",
+                    "Phone No": "(415) 479-2080",
+                    "Contact": "",
+                    "Instrument Count": 7
+                },
+                {
+                    "Vendor": "Process Management Gro",
+                    "Phone No": "",
+                    "Contact": "",
+                    "Instrument Count": 0
+                },
+                {
+                    "Vendor": "Relevant",
+                    "Phone No": "(209) 300-6980",
+                    "Contact": "Bill Promes",
+                    "Instrument Count": 1
+                },
+                {
+                    "Vendor": "RM Controls",
+                    "Phone No": "(805) 499-4499",
+                    "Contact": "Ralph Matthews",
+                    "Instrument Count": 4
+                },
+                {
+                    "Vendor": "Rosemount",
+                    "Phone No": "(800) 999-9307",
+                    "Contact": "Tom Boerner",
+                    "Instrument Count": 202
+                },
+                {
+                    "Vendor": "ROTRONIC Inst. Corp",
+                    "Phone No": "",
+                    "Contact": "",
+                    "Instrument Count": 1
+                },
+                {
+                    "Vendor": "RUST Automation",
+                    "Phone No": "(801) 566-7878",
+                    "Contact": "Brandon Calvillo",
+                    "Instrument Count": 3
+                },
+                {
+                    "Vendor": "Seco Controls",
+                    "Phone No": "(888) 798-8300",
+                    "Contact": "David Langford",
+                    "Instrument Count": 35
+                },
+                {
+                    "Vendor": "Storeroom",
+                    "Phone No": "",
+                    "Contact": "",
+                    "Instrument Count": 1
+                },
+                {
+                    "Vendor": "Technical Sales",
+                    "Phone No": "(415) 346-1655",
+                    "Contact": "",
+                    "Instrument Count": 137
+                },
+                {
+                    "Vendor": "Tempresco",
+                    "Phone No": "(510) 829-3400",
+                    "Contact": "",
+                    "Instrument Count": 1
+                },
+                {
+                    "Vendor": "Thermo Electric",
+                    "Phone No": "",
+                    "Contact": "",
+                    "Instrument Count": 5
+                },
+                {
+                    "Vendor": "Valin Corp",
+                    "Phone No": "(510) 689-5200",
+                    "Contact": "",
+                    "Instrument Count": 4
+                },
+                {
+                    "Vendor": "Valley Electric",
+                    "Phone No": "(916) 448-8271",
+                    "Contact": "Bill Knapp",
+                    "Instrument Count": 10
+                },
+                {
+                    "Vendor": "Varec",
+                    "Phone No": "(510) 521-5000",
+                    "Contact": "Charles Waters",
+                    "Instrument Count": 14
+                },
+                {
+                    "Vendor": "Vossler",
+                    "Phone No": "",
+                    "Contact": "",
+                    "Instrument Count": 1
+                },
+                {
+                    "Vendor": "Wagner Process Equipment",
+                    "Phone No": "(209) 931-0100",
+                    "Contact": "John Thorton",
+                    "Instrument Count": 12
+                },
+                {
+                    "Vendor": "Windustrial",
+                    "Phone No": "",
+                    "Contact": "",
+                    "Instrument Count": 2
+                }
+            ]
+
+
+        function getData2() {
+            return [
+                {
+                    "Manufacturer": "ABB",
+                    "Phone No": "",
+                    "Instrument Count": 4
+                },
+                {
+                    "Manufacturer": "Agar Technologies",
+                    "Phone No": "",
+                    "Instrument Count": 0
+                },
+                {
+                    "Manufacturer": "Air Pax",
+                    "Phone No": "(305) 587-1100",
+                    "Instrument Count": 1
+                },
+                {
+                    "Manufacturer": "Allen-Bradley",
+                    "Phone No": "(414) 382-2000",
+                    "Instrument Count": 10
+                },
+                {
+                    "Manufacturer": "Apollo",
+                    "Phone No": "",
+                    "Instrument Count": 223
+                },
+                {
+                    "Manufacturer": "Aquamatic",
+                    "Phone No": "",
+                    "Instrument Count": 14
+                },
+                {
+                    "Manufacturer": "Asco",
+                    "Phone No": "(201) 966-2000",
+                    "Instrument Count": 53
+                },
+                {
+                    "Manufacturer": "Ashcroft",
+                    "Phone No": "(800) 243-8160",
+                    "Instrument Count": 453
+                },
+                {
+                    "Manufacturer": "Bailey",
+                    "Phone No": "(510) 783-2705",
+                    "Instrument Count": 2
+                },
+                {
+                    "Manufacturer": "Bellofram",
+                    "Phone No": "(304) 387-1200",
+                    "Instrument Count": 1
+                },
+                {
+                    "Manufacturer": "British Engine",
+                    "Phone No": "",
+                    "Instrument Count": 2
+                },
+                {
+                    "Manufacturer": "Brooks",
+                    "Phone No": "(213) 921-3486",
+                    "Instrument Count": 23
+                },
+                {
+                    "Manufacturer": "Burling Inst. Co.",
+                    "Phone No": "(201) 635-9481",
+                    "Instrument Count": 6
+                },
+                {
+                    "Manufacturer": "Burns",
+                    "Phone No": "(800) 328-3871",
+                    "Instrument Count": 255
+                },
+                {
+                    "Manufacturer": "Catawissa",
+                    "Phone No": "(717) 356-2311",
+                    "Instrument Count": 1
+                },
+                {
+                    "Manufacturer": "Christi-Machine",
+                    "Phone No": "(916) 631-0917",
+                    "Instrument Count": 4
+                },
+                {
+                    "Manufacturer": "Cla-Val",
+                    "Phone No": "",
+                    "Instrument Count": 1
+                },
+                {
+                    "Manufacturer": "Collins",
+                    "Phone No": "",
+                    "Instrument Count": 3
+                },
+                {
+                    "Manufacturer": "Crane",
+                    "Phone No": "(815) 727-2600",
+                    "Instrument Count": 5
+                },
+                {
+                    "Manufacturer": "Crosby",
+                    "Phone No": "(508) 384-3121",
+                    "Instrument Count": 1
+                },
+                {
+                    "Manufacturer": "Daniel",
+                    "Phone No": "(215) 641-3000",
+                    "Instrument Count": 34
+                },
+                {
+                    "Manufacturer": "Davis Controls",
+                    "Phone No": "",
+                    "Instrument Count": 1
+                },
+                {
+                    "Manufacturer": "Dezurik",
+                    "Phone No": "(612) 259-2000",
+                    "Instrument Count": 2
+                },
+                {
+                    "Manufacturer": "Drexelbrook",
+                    "Phone No": "(800) 527-6297",
+                    "Instrument Count": 39
+                },
+                {
+                    "Manufacturer": "Durco",
+                    "Phone No": "",
+                    "Instrument Count": 7
+                },
+                {
+                    "Manufacturer": "Duro (Colesco)",
+                    "Phone No": "(513) 489-1122",
+                    "Instrument Count": 3
+                },
+                {
+                    "Manufacturer": "Dwyer",
+                    "Phone No": "(714) 630-6424",
+                    "Instrument Count": 9
+                },
+                {
+                    "Manufacturer": "Dynalco",
+                    "Phone No": "(305) 739-4300",
+                    "Instrument Count": 7
+                },
+                {
+                    "Manufacturer": "Dynatrol",
+                    "Phone No": "(800) 231-2062",
+                    "Instrument Count": 9
+                },
+                {
+                    "Manufacturer": "Ellison",
+                    "Phone No": "",
+                    "Instrument Count": 3
+                },
+                {
+                    "Manufacturer": "Equimeter",
+                    "Phone No": "(800) 375-8875",
+                    "Instrument Count": 1
+                },
+                {
+                    "Manufacturer": "Ernst Prod",
+                    "Phone No": "(908) 938-5641",
+                    "Instrument Count": 12
+                },
+                {
+                    "Manufacturer": "Fairchild",
+                    "Phone No": "(910) 659-3472",
+                    "Instrument Count": 7
+                },
+                {
+                    "Manufacturer": "Fenwal",
+                    "Phone No": "",
+                    "Instrument Count": 2
+                },
+                {
+                    "Manufacturer": "Fischer & Porter",
+                    "Phone No": "(800) 421-3411",
+                    "Instrument Count": 9
+                },
+                {
+                    "Manufacturer": "Fisher",
+                    "Phone No": "",
+                    "Instrument Count": 648
+                },
+                {
+                    "Manufacturer": "Flow Tech",
+                    "Phone No": "(602) 268-8776",
+                    "Instrument Count": 14
+                },
+                {
+                    "Manufacturer": "Fluidic",
+                    "Phone No": "",
+                    "Instrument Count": 1
+                },
+                {
+                    "Manufacturer": "Gayesco",
+                    "Phone No": "(800) 235-8540",
+                    "Instrument Count": 11
+                },
+                {
+                    "Manufacturer": "General Eastern",
+                    "Phone No": "",
+                    "Instrument Count": 0
+                },
+                {
+                    "Manufacturer": "H2 Scan",
+                    "Phone No": "",
+                    "Instrument Count": 7
+                },
+                {
+                    "Manufacturer": "Habonim",
+                    "Phone No": "",
+                    "Instrument Count": 1
+                },
+                {
+                    "Manufacturer": "Hammel Dahl",
+                    "Phone No": "(401) 781-6200",
+                    "Instrument Count": 7
+                },
+                {
+                    "Manufacturer": "Helicoid",
+                    "Phone No": "(203) 755-4300",
+                    "Instrument Count": 83
+                },
+                {
+                    "Manufacturer": "Hoerbiger",
+                    "Phone No": "(805) 257-2888",
+                    "Instrument Count": 1
+                },
+                {
+                    "Manufacturer": "Honeywell",
+                    "Phone No": "(800) 223-8947",
+                    "Instrument Count": 269
+                },
+                {
+                    "Manufacturer": "Hydro-Thermal",
+                    "Phone No": "",
+                    "Instrument Count": 1
+                },
+                {
+                    "Manufacturer": "ITT Barton",
+                    "Phone No": "(213) 961-2547",
+                    "Instrument Count": 2
+                },
+                {
+                    "Manufacturer": "Jerguson",
+                    "Phone No": "(216) 572-7400",
+                    "Instrument Count": 34
+                },
+                {
+                    "Manufacturer": "Johnson Controls",
+                    "Phone No": "(916) 635-6699",
+                    "Instrument Count": 3
+                },
+                {
+                    "Manufacturer": "Johnson-Yokogawa",
+                    "Phone No": "(404) 254-0400",
+                    "Instrument Count": 6
+                },
+                {
+                    "Manufacturer": "KING",
+                    "Phone No": "",
+                    "Instrument Count": 2
+                },
+                {
+                    "Manufacturer": "Kistler Morse",
+                    "Phone No": "(800) 426-9010",
+                    "Instrument Count": 7
+                },
+                {
+                    "Manufacturer": "L&N",
+                    "Phone No": "(714) 937-1647",
+                    "Instrument Count": 1
+                },
+                {
+                    "Manufacturer": "Leeds & Northrup",
+                    "Phone No": "",
+                    "Instrument Count": 2
+                },
+                {
+                    "Manufacturer": "Magnatrol",
+                    "Phone No": "(708) 969-4000",
+                    "Instrument Count": 12
+                },
+                {
+                    "Manufacturer": "Magnatrol Valves",
+                    "Phone No": "(973) 427-4341",
+                    "Instrument Count": 4
+                },
+                {
+                    "Manufacturer": "Maxitrol",
+                    "Phone No": "",
+                    "Instrument Count": 1
+                },
+                {
+                    "Manufacturer": "Maxon",
+                    "Phone No": "",
+                    "Instrument Count": 12
+                },
+                {
+                    "Manufacturer": "McCrometer",
+                    "Phone No": "",
+                    "Instrument Count": 1
+                },
+                {
+                    "Manufacturer": "McDonnell & Miller",
+                    "Phone No": "(312) 267-1600",
+                    "Instrument Count": 1
+                },
+                {
+                    "Manufacturer": "McJunkin",
+                    "Phone No": "",
+                    "Instrument Count": 0
+                },
+                {
+                    "Manufacturer": "McMaster Carr",
+                    "Phone No": "(310) 692-5911",
+                    "Instrument Count": 1
+                },
+                {
+                    "Manufacturer": "Mercoid",
+                    "Phone No": "(312) 736-2100",
+                    "Instrument Count": 16
+                },
+                {
+                    "Manufacturer": "Mettler Toledo",
+                    "Phone No": "",
+                    "Instrument Count": 9
+                },
+                {
+                    "Manufacturer": "Micro Motion",
+                    "Phone No": "",
+                    "Instrument Count": 53
+                },
+                {
+                    "Manufacturer": "Micro Switch",
+                    "Phone No": "(800) 537-6945",
+                    "Instrument Count": 2
+                },
+                {
+                    "Manufacturer": "Micromotion",
+                    "Phone No": "(800) 522-6277",
+                    "Instrument Count": 81
+                },
+                {
+                    "Manufacturer": "Mine Safety Appliance",
+                    "Phone No": "(800) 672-2222",
+                    "Instrument Count": 2
+                },
+                {
+                    "Manufacturer": "Monitek",
+                    "Phone No": "(510) 471-8300",
+                    "Instrument Count": 2
+                },
+                {
+                    "Manufacturer": "Moore Ind",
+                    "Phone No": "(800) 999-2900",
+                    "Instrument Count": 101
+                },
+                {
+                    "Manufacturer": "Moore Prod",
+                    "Phone No": "(415) 887-5535",
+                    "Instrument Count": 12
+                },
+                {
+                    "Manufacturer": "MSA",
+                    "Phone No": "",
+                    "Instrument Count": 1
+                },
+                {
+                    "Manufacturer": "Murphy",
+                    "Phone No": "(805) 272-4700",
+                    "Instrument Count": 2
+                },
+                {
+                    "Manufacturer": "Neles-Jamesbury",
+                    "Phone No": "(508) 852-0200",
+                    "Instrument Count": 76
+                },
+                {
+                    "Manufacturer": "Numatics Engineering",
+                    "Phone No": "",
+                    "Instrument Count": 14
+                },
+                {
+                    "Manufacturer": "Ohmart/VEGA",
+                    "Phone No": "(513) 272-0131",
+                    "Instrument Count": 114
+                },
+                {
+                    "Manufacturer": "Omega",
+                    "Phone No": "(203) 359-1660",
+                    "Instrument Count": 5
+                },
+                {
+                    "Manufacturer": "Orion Instruments",
+                    "Phone No": "(225) 236-9946",
+                    "Instrument Count": 2
+                },
+                {
+                    "Manufacturer": "Palmer",
+                    "Phone No": "(510) 770-8522",
+                    "Instrument Count": 20
+                },
+                {
+                    "Manufacturer": "PANAMETRICS",
+                    "Phone No": "",
+                    "Instrument Count": 1
+                },
+                {
+                    "Manufacturer": "PDC",
+                    "Phone No": "",
+                    "Instrument Count": 1
+                },
+                {
+                    "Manufacturer": "Peeco",
+                    "Phone No": "(910) 775-3355",
+                    "Instrument Count": 15
+                },
+                {
+                    "Manufacturer": "Pepperl Fuchs",
+                    "Phone No": "(330) 425-3555",
+                    "Instrument Count": 2
+                },
+                {
+                    "Manufacturer": "Posiseal",
+                    "Phone No": "(203) 599-1140",
+                    "Instrument Count": 2
+                },
+                {
+                    "Manufacturer": "Raytek",
+                    "Phone No": "",
+                    "Instrument Count": 2
+                },
+                {
+                    "Manufacturer": "Research Ctrls",
+                    "Phone No": "",
+                    "Instrument Count": 5
+                },
+                {
+                    "Manufacturer": "Rimcor",
+                    "Phone No": "",
+                    "Instrument Count": 1
+                },
+                {
+                    "Manufacturer": "Rosemount",
+                    "Phone No": "(800) 654-7768",
+                    "Instrument Count": 270
+                },
+                {
+                    "Manufacturer": "ROTRONIC",
+                    "Phone No": "",
+                    "Instrument Count": 1
+                },
+                {
+                    "Manufacturer": "SIERRA INSTRUMENTS",
+                    "Phone No": "",
+                    "Instrument Count": 1
+                },
+                {
+                    "Manufacturer": "Solar Weston",
+                    "Phone No": "",
+                    "Instrument Count": 75
+                },
+                {
+                    "Manufacturer": "Spence",
+                    "Phone No": "",
+                    "Instrument Count": 1
+                },
+                {
+                    "Manufacturer": "Static-O-Ring",
+                    "Phone No": "(913) 888-2630",
+                    "Instrument Count": 8
+                },
+                {
+                    "Manufacturer": "Strahman",
+                    "Phone No": "",
+                    "Instrument Count": 1
+                },
+                {
+                    "Manufacturer": "Taylor",
+                    "Phone No": "(716) 292-6050",
+                    "Instrument Count": 31
+                },
+                {
+                    "Manufacturer": "Teledyne",
+                    "Phone No": "(213) 961-9221",
+                    "Instrument Count": 1
+                },
+                {
+                    "Manufacturer": "Thermo Electric",
+                    "Phone No": "(818) 765-5276",
+                    "Instrument Count": 7
+                },
+                {
+                    "Manufacturer": "Thermox",
+                    "Phone No": "",
+                    "Instrument Count": 5
+                },
+                {
+                    "Manufacturer": "Thomas & Betts",
+                    "Phone No": "",
+                    "Instrument Count": 3
+                },
+                {
+                    "Manufacturer": "Trueline",
+                    "Phone No": "",
+                    "Instrument Count": 2
+                },
+                {
+                    "Manufacturer": "Tufline",
+                    "Phone No": "(513) 745-6000",
+                    "Instrument Count": 9
+                },
+                {
+                    "Manufacturer": "United Electric",
+                    "Phone No": "(617) 926-1000",
+                    "Instrument Count": 3
+                },
+                {
+                    "Manufacturer": "Varec",
+                    "Phone No": "(714) 761-1300",
+                    "Instrument Count": 14
+                },
+                {
+                    "Manufacturer": "Veeder-Root",
+                    "Phone No": "(203) 527-7201",
+                    "Instrument Count": 3
+                },
+                {
+                    "Manufacturer": "VEGA",
+                    "Phone No": "1 (800) 367-5383",
+                    "Instrument Count": 1
+                },
+                {
+                    "Manufacturer": "Versa",
+                    "Phone No": "(201) 843-2400",
+                    "Instrument Count": 1
+                },
+                {
+                    "Manufacturer": "Westcon",
+                    "Phone No": "(717) 354-8430",
+                    "Instrument Count": 18
+                },
+                {
+                    "Manufacturer": "Westlock",
+                    "Phone No": "",
+                    "Instrument Count": 1
+                },
+                {
+                    "Manufacturer": "Whitey",
+                    "Phone No": "",
+                    "Instrument Count": 1
+                },
+                {
+                    "Manufacturer": "Worcester",
+                    "Phone No": "(508) 481-4800",
+                    "Instrument Count": 25
+                },
+                {
+                    "Manufacturer": "Xomox",
+                    "Phone No": "",
+                    "Instrument Count": 8
+                },
+                {
+                    "Manufacturer": "Yokogawa",
+                    "Phone No": "",
+                    "Instrument Count": 1
+                }
+
+            ];
+        }
+
+
+        $(document).ready(function () {
+
+            $("#tabs").tabs();
+        });
+
+        //$(document).ready(function () {
+        //    populateTable(document.getElementById('example2'), getData());
+
+        //    function dataFields(data) {
+        //        return data.reduce((r, x) => Object.keys(x).reduce((s, k) => s.indexOf(k) === -1 ? s.concat(k) : s, r), []);
+        //    }
+
+        //    /* Can be useful if working with raw JSON data */
+        //    function searchCriteria(fields) {
+        //        return Array.from(fields).reduce((o, field) => {
+        //            return Object.assign(o, { [field.getAttribute('placeholder')]: field.value });
+        //        }, {});
+        //    }
+
+        //    function onFilter(e) {
+        //        var table = e.target.parentElement.parentElement.parentElement.parentElement;
+        //        console.log(table);
+        //        var fields = table.querySelectorAll('thead tr th input');
+        //        console.log(fields);
+        //        var searchText = Array.from(fields).map(function (field) {
+        //            return field.value.trim();
+        //        });
+        //        console.log(searchText);
+        //        Array.from(table.querySelectorAll('tbody tr')).forEach(function (row) {
+        //            var hideRow = false;
+        //            Array.from(row.children).forEach(function (col, index) {
+        //                var value = col.innerHTML.trim().toLowerCase();
+        //                console.log(value);
+        //                var search = searchText[index].toLowerCase();
+        //                console.log(search);
+        //                if (search.length > 0) {
+        //                    if (value.indexOf(search) === -1) {
+        //                        hideRow = true;
+        //                        return;
+        //                    }
+        //                }
+        //            });
+        //            row.classList.toggle('hidden-row', hideRow);
+        //        });
+        //    }
+
+        //    function populateTable(table, data) {
+        //        let fields = dataFields(data);
+        //        let thead = document.createElement('THEAD');
+        //        let tr = document.createElement('TR');
+        //        fields.forEach(field => {
+        //            let th = document.createElement('TH');
+        //            th.innerHTML = field;
+        //            tr.appendChild(th);
+        //        });
+        //        thead.appendChild(tr);
+        //        let tbody = document.createElement('TBODY');
+        //        tr = document.createElement('TR');
+        //        fields.forEach(field => {
+        //            let th = document.createElement('TH');
+        //            let input = document.createElement('INPUT');
+        //            /*input.setAttribute('placeholder', field);*/
+        //            input.addEventListener('keyup', onFilter);
+        //            th.append(input);
+        //            tr.appendChild(th);
+        //        });
+        //        thead.appendChild(tr);
+        //        data.forEach(record => {
+        //            let tr = document.createElement('TR');
+        //            fields.forEach(field => {
+        //                let td = document.createElement('TD');
+        //                td.innerHTML = record[field];
+        //                tr.appendChild(td);
+        //            });
+        //            tbody.append(tr);
+        //        });
+        //        table.appendChild(thead);
+        //        table.appendChild(tbody);
+        //    }
+
+        //    $('#example2').DataTable({
+        //        orderCellsTop: true,
+        //        order: [],
+        //        paging: false,
+        //        autowidth: false,
+        //        pageLength: false,
+        //        bInfo: false,
+        //        responsive: true
+
+
+
+        //    });
+
+
+        //    function getData() {
+        //        return
+        //        [
+        //            {
+        //                "Vendor": "*",
+        //                "Phone No": "",
+        //                "Contact": "",
+        //                "Instrument Count": 5
+        //            },
+        //            {
+        //                "Vendor": "A&A",
+        //                "Phone No": "(713) 938-4270",
+        //                "Contact": "",
+        //                "Instrument Count": 2
+        //            },
+        //            {
+        //                "Vendor": "Advanced Control Solutions",
+        //                "Phone No": "(510) 262-1882",
+        //                "Contact": "Paul Mahoney",
+        //                "Instrument Count": 29
+        //            },
+        //            {
+        //                "Vendor": "APC",
+        //                "Phone No": "(925) 846-9000",
+        //                "Contact": "Dave Kandel",
+        //                "Instrument Count": 1267
+        //            },
+        //            {
+        //                "Vendor": "Assoc. Flow Ctrls",
+        //                "Phone No": "(510) 820-1216",
+        //                "Contact": "Jay",
+        //                "Instrument Count": 1
+        //            },
+        //            {
+        //                "Vendor": "Automation Prod",
+        //                "Phone No": "(713) 869-0361",
+        //                "Contact": "Steve Sawyer",
+        //                "Instrument Count": 9
+        //            },
+        //            {
+        //                "Vendor": "Automation Service",
+        //                "Phone No": "",
+        //                "Contact": "",
+        //                "Instrument Count": 4
+        //            },
+        //            {
+        //                "Vendor": "BAKER FURNACE",
+        //                "Phone No": "",
+        //                "Contact": "",
+        //                "Instrument Count": 1
+        //            },
+        //            {
+        //                "Vendor": "Bearing Supply",
+        //                "Phone No": "(916) 443-4816",
+        //                "Contact": "",
+        //                "Instrument Count": 2
+        //            },
+        //            {
+        //                "Vendor": "Belilove",
+        //                "Phone No": "(510) 658-9011",
+        //                "Contact": "Peter Rothermel",
+        //                "Instrument Count": 72
+        //            },
+        //            {
+        //                "Vendor": "Berindsen",
+        //                "Phone No": "(916) 372-0550",
+        //                "Contact": "",
+        //                "Instrument Count": 1
+        //            },
+        //            {
+        //                "Vendor": "Buringurd",
+        //                "Phone No": "(707) 486-2490",
+        //                "Contact": "",
+        //                "Instrument Count": 41
+        //            },
+        //            {
+        //                "Vendor": "Burling Inst",
+        //                "Phone No": "(201) 635-9481",
+        //                "Contact": "",
+        //                "Instrument Count": 6
+        //            },
+        //            {
+        //                "Vendor": "Burns",
+        //                "Phone No": "(800) 328-3871",
+        //                "Contact": "Judy",
+        //                "Instrument Count": 254
+        //            },
+        //            {
+        //                "Vendor": "Cal Pacific",
+        //                "Phone No": "(510) 527-6728",
+        //                "Contact": "",
+        //                "Instrument Count": 9
+        //            },
+        //            {
+        //                "Vendor": "California Hydronics Corp.",
+        //                "Phone No": "(510) 293-1993",
+        //                "Contact": "",
+        //                "Instrument Count": 1
+        //            },
+        //            {
+        //                "Vendor": "Caltrol",
+        //                "Phone No": "",
+        //                "Contact": "",
+        //                "Instrument Count": 49
+        //            },
+        //            {
+        //                "Vendor": "Catawissa",
+        //                "Phone No": "(717) 356-2311",
+        //                "Contact": "Patricia Wondoloski",
+        //                "Instrument Count": 1
+        //            },
+        //            {
+        //                "Vendor": "Cfm",
+        //                "Phone No": "(510) 370-1500",
+        //                "Contact": "",
+        //                "Instrument Count": 4
+        //            },
+        //            {
+        //                "Vendor": "Christi-Machine",
+        //                "Phone No": "(916) 631-0917",
+        //                "Contact": "Fred Finsterbusch",
+        //                "Instrument Count": 4
+        //            },
+        //            {
+        //                "Vendor": "Clipper Controls",
+        //                "Phone No": "",
+        //                "Contact": "",
+        //                "Instrument Count": 1
+        //            },
+        //            {
+        //                "Vendor": "Colesco",
+        //                "Phone No": "(513) 489-1122",
+        //                "Contact": "Harold or Steve",
+        //                "Instrument Count": 3
+        //            },
+        //            {
+        //                "Vendor": "Control Specialties",
+        //                "Phone No": "",
+        //                "Contact": "",
+        //                "Instrument Count": 75
+        //            },
+        //            {
+        //                "Vendor": "Controlco",
+        //                "Phone No": "(916) 927-5599",
+        //                "Contact": "",
+        //                "Instrument Count": 38
+        //            },
+        //            {
+        //                "Vendor": "Controltech",
+        //                "Phone No": "(916) 922-9367",
+        //                "Contact": "",
+        //                "Instrument Count": 4
+        //            },
+        //            {
+        //                "Vendor": "Crane",
+        //                "Phone No": "(815) 727-2600",
+        //                "Contact": "Lillian",
+        //                "Instrument Count": 5
+        //            },
+        //            {
+        //                "Vendor": "Daniel",
+        //                "Phone No": "",
+        //                "Contact": "",
+        //                "Instrument Count": 6
+        //            },
+        //            {
+        //                "Vendor": "Duhig",
+        //                "Phone No": "",
+        //                "Contact": "",
+        //                "Instrument Count": 4
+        //            },
+        //            {
+        //                "Vendor": "Dwyer",
+        //                "Phone No": "",
+        //                "Contact": "",
+        //                "Instrument Count": 3
+        //            },
+        //            {
+        //                "Vendor": "Dynalco",
+        //                "Phone No": "(305) 739-4300",
+        //                "Contact": "",
+        //                "Instrument Count": 7
+        //            },
+        //            {
+        //                "Vendor": "Emerson",
+        //                "Phone No": "",
+        //                "Contact": "",
+        //                "Instrument Count": 25
+        //            },
+        //            {
+        //                "Vendor": "Emerson Rosemount",
+        //                "Phone No": "",
+        //                "Contact": "",
+        //                "Instrument Count": 2
+        //            },
+        //            {
+        //                "Vendor": "Flo-Con",
+        //                "Phone No": "(510) 521-5000",
+        //                "Contact": "Charles Waters",
+        //                "Instrument Count": 1
+        //            },
+        //            {
+        //                "Vendor": "Flomax Prod",
+        //                "Phone No": "(510) 449-5900",
+        //                "Contact": "Jerry Morgenroth",
+        //                "Instrument Count": 18
+        //            },
+        //            {
+        //                "Vendor": "Flow Technology",
+        //                "Phone No": "(602) 437-1315",
+        //                "Contact": "",
+        //                "Instrument Count": 14
+        //            },
+        //            {
+        //                "Vendor": "Flw",
+        //                "Phone No": "(510) 651-6511",
+        //                "Contact": "",
+        //                "Instrument Count": 18
+        //            },
+        //            {
+        //                "Vendor": "Frank A Olsen",
+        //                "Phone No": "(510) 839-5442",
+        //                "Contact": "",
+        //                "Instrument Count": 2
+        //            },
+        //            {
+        //                "Vendor": "G.M. Cooke Assoc",
+        //                "Phone No": "(510) 676-0783",
+        //                "Contact": "",
+        //                "Instrument Count": 2
+        //            },
+        //            {
+        //                "Vendor": "Gayesco",
+        //                "Phone No": "(800) 235-2540",
+        //                "Contact": "Tim Mclaughlin",
+        //                "Instrument Count": 11
+        //            },
+        //            {
+        //                "Vendor": "General Process Controls",
+        //                "Phone No": "(916) 353-1507",
+        //                "Contact": "Dave Peterson",
+        //                "Instrument Count": 20
+        //            },
+        //            {
+        //                "Vendor": "Graybar",
+        //                "Phone No": "",
+        //                "Contact": "",
+        //                "Instrument Count": 3
+        //            },
+        //            {
+        //                "Vendor": "H2 Scan",
+        //                "Phone No": "",
+        //                "Contact": "",
+        //                "Instrument Count": 7
+        //            },
+        //            {
+        //                "Vendor": "Hammel Dahl",
+        //                "Phone No": "(508) 852-0200",
+        //                "Contact": "Ed Cassidy",
+        //                "Instrument Count": 7
+        //            },
+        //            {
+        //                "Vendor": "Hill & Watson",
+        //                "Phone No": "",
+        //                "Contact": "",
+        //                "Instrument Count": 79
+        //            },
+        //            {
+        //                "Vendor": "Hoerbiger",
+        //                "Phone No": "(805) 257-2888",
+        //                "Contact": "Jerry Hubner",
+        //                "Instrument Count": 1
+        //            },
+        //            {
+        //                "Vendor": "Honeywell",
+        //                "Phone No": "(916) 923-7805",
+        //                "Contact": "",
+        //                "Instrument Count": 228
+        //            },
+        //            {
+        //                "Vendor": "Hydro-Thermal",
+        //                "Phone No": "",
+        //                "Contact": "",
+        //                "Instrument Count": 1
+        //            },
+        //            {
+        //                "Vendor": "J&B",
+        //                "Phone No": "(510) 866-1515",
+        //                "Contact": "Bill Warfield",
+        //                "Instrument Count": 2
+        //            },
+        //            {
+        //                "Vendor": "James Murray & Assoc",
+        //                "Phone No": "(513) 574-8500",
+        //                "Contact": "",
+        //                "Instrument Count": 1
+        //            },
+        //            {
+        //                "Vendor": "Jensen Instr Co",
+        //                "Phone No": "(415) 589-9720",
+        //                "Contact": "",
+        //                "Instrument Count": 13
+        //            },
+        //            {
+        //                "Vendor": "Johnson Ctrls",
+        //                "Phone No": "(916) 635-6699",
+        //                "Contact": "Mark Prioletta",
+        //                "Instrument Count": 5
+        //            },
+        //            {
+        //                "Vendor": "Katz Controls",
+        //                "Phone No": "(408) 725-8671",
+        //                "Contact": "Sam Katz",
+        //                "Instrument Count": 1
+        //            },
+        //            {
+        //                "Vendor": "Kele",
+        //                "Phone No": "",
+        //                "Contact": "",
+        //                "Instrument Count": 0
+        //            },
+        //            {
+        //                "Vendor": "L",
+        //                "Phone No": "",
+        //                "Contact": "",
+        //                "Instrument Count": 1
+        //            },
+        //            {
+        //                "Vendor": "Linden systems",
+        //                "Phone No": "",
+        //                "Contact": "",
+        //                "Instrument Count": 14
+        //            },
+        //            {
+        //                "Vendor": "M.L.Johnson",
+        //                "Phone No": "(513) 874-8445",
+        //                "Contact": "",
+        //                "Instrument Count": 1
+        //            },
+        //            {
+        //                "Vendor": "Mac Tech",
+        //                "Phone No": "(510) 632-2000",
+        //                "Contact": "Charles Feltman",
+        //                "Instrument Count": 3
+        //            },
+        //            {
+        //                "Vendor": "Magnatrol",
+        //                "Phone No": "",
+        //                "Contact": "",
+        //                "Instrument Count": 2
+        //            },
+        //            {
+        //                "Vendor": "McJUNKIN",
+        //                "Phone No": "",
+        //                "Contact": "",
+        //                "Instrument Count": 26
+        //            },
+        //            {
+        //                "Vendor": "McJUNKINRedman",
+        //                "Phone No": "",
+        //                "Contact": "",
+        //                "Instrument Count": 5
+        //            },
+        //            {
+        //                "Vendor": "McMaster Carr",
+        //                "Phone No": "(310) 692-5911 x2",
+        //                "Contact": "Rose",
+        //                "Instrument Count": 1
+        //            },
+        //            {
+        //                "Vendor": "MCR Technologies",
+        //                "Phone No": "",
+        //                "Contact": "",
+        //                "Instrument Count": 3
+        //            },
+        //            {
+        //                "Vendor": "Micromotion",
+        //                "Phone No": "(925) 362-4091",
+        //                "Contact": "Dave Schratz",
+        //                "Instrument Count": 68
+        //            },
+        //            {
+        //                "Vendor": "Milligan Spika Co",
+        //                "Phone No": "(510) 562-6667",
+        //                "Contact": "Rachel Haburjak",
+        //                "Instrument Count": 4
+        //            },
+        //            {
+        //                "Vendor": "Mine Safety Appliance",
+        //                "Phone No": "(805) 581-1919",
+        //                "Contact": "Ron Devlin",
+        //                "Instrument Count": 2
+        //            },
+        //            {
+        //                "Vendor": "Monitek",
+        //                "Phone No": "",
+        //                "Contact": "",
+        //                "Instrument Count": 1
+        //            },
+        //            {
+        //                "Vendor": "Moore Prod",
+        //                "Phone No": "(415) 887-5535",
+        //                "Contact": "J. Richard Shand",
+        //                "Instrument Count": 12
+        //            },
+        //            {
+        //                "Vendor": "Motion Industries",
+        //                "Phone No": "(916) 455-1990",
+        //                "Contact": "John",
+        //                "Instrument Count": 8
+        //            },
+        //            {
+        //                "Vendor": "MRC Global",
+        //                "Phone No": "(661) 332-0654",
+        //                "Contact": "Cameron Barker",
+        //                "Instrument Count": 24
+        //            },
+        //            {
+        //                "Vendor": "MSA",
+        //                "Phone No": "",
+        //                "Contact": "",
+        //                "Instrument Count": 0
+        //            },
+        //            {
+        //                "Vendor": "Numatics Engineering",
+        //                "Phone No": "",
+        //                "Contact": "",
+        //                "Instrument Count": 14
+        //            },
+        //            {
+        //                "Vendor": "Oakland Valve and Fitting",
+        //                "Phone No": "",
+        //                "Contact": "",
+        //                "Instrument Count": 1
+        //            },
+        //            {
+        //                "Vendor": "Ohmart",
+        //                "Phone No": "(513) 272-0131",
+        //                "Contact": "Jerry",
+        //                "Instrument Count": 70
+        //            },
+        //            {
+        //                "Vendor": "Omega",
+        //                "Phone No": "(203) 359-1660",
+        //                "Contact": "",
+        //                "Instrument Count": 5
+        //            },
+        //            {
+        //                "Vendor": "Palmer",
+        //                "Phone No": "(510) 770-8522",
+        //                "Contact": "Bob Dickerson",
+        //                "Instrument Count": 20
+        //            },
+        //            {
+        //                "Vendor": "PANAMETRICS",
+        //                "Phone No": "",
+        //                "Contact": "",
+        //                "Instrument Count": 1
+        //            },
+        //            {
+        //                "Vendor": "Parker Supply Company",
+        //                "Phone No": "(323) 268-3581",
+        //                "Contact": "Debbie Miller",
+        //                "Instrument Count": 1
+        //            },
+        //            {
+        //                "Vendor": "Phoenix Eq Co",
+        //                "Phone No": "(415) 479-2080",
+        //                "Contact": "",
+        //                "Instrument Count": 7
+        //            },
+        //            {
+        //                "Vendor": "Process Management Gro",
+        //                "Phone No": "",
+        //                "Contact": "",
+        //                "Instrument Count": 0
+        //            },
+        //            {
+        //                "Vendor": "Relevant",
+        //                "Phone No": "(209) 300-6980",
+        //                "Contact": "Bill Promes",
+        //                "Instrument Count": 1
+        //            },
+        //            {
+        //                "Vendor": "RM Controls",
+        //                "Phone No": "(805) 499-4499",
+        //                "Contact": "Ralph Matthews",
+        //                "Instrument Count": 4
+        //            },
+        //            {
+        //                "Vendor": "Rosemount",
+        //                "Phone No": "(800) 999-9307",
+        //                "Contact": "Tom Boerner",
+        //                "Instrument Count": 202
+        //            },
+        //            {
+        //                "Vendor": "ROTRONIC Inst. Corp",
+        //                "Phone No": "",
+        //                "Contact": "",
+        //                "Instrument Count": 1
+        //            },
+        //            {
+        //                "Vendor": "RUST Automation",
+        //                "Phone No": "(801) 566-7878",
+        //                "Contact": "Brandon Calvillo",
+        //                "Instrument Count": 3
+        //            },
+        //            {
+        //                "Vendor": "Seco Controls",
+        //                "Phone No": "(888) 798-8300",
+        //                "Contact": "David Langford",
+        //                "Instrument Count": 35
+        //            },
+        //            {
+        //                "Vendor": "Storeroom",
+        //                "Phone No": "",
+        //                "Contact": "",
+        //                "Instrument Count": 1
+        //            },
+        //            {
+        //                "Vendor": "Technical Sales",
+        //                "Phone No": "(415) 346-1655",
+        //                "Contact": "",
+        //                "Instrument Count": 137
+        //            },
+        //            {
+        //                "Vendor": "Tempresco",
+        //                "Phone No": "(510) 829-3400",
+        //                "Contact": "",
+        //                "Instrument Count": 1
+        //            },
+        //            {
+        //                "Vendor": "Thermo Electric",
+        //                "Phone No": "",
+        //                "Contact": "",
+        //                "Instrument Count": 5
+        //            },
+        //            {
+        //                "Vendor": "Valin Corp",
+        //                "Phone No": "(510) 689-5200",
+        //                "Contact": "",
+        //                "Instrument Count": 4
+        //            },
+        //            {
+        //                "Vendor": "Valley Electric",
+        //                "Phone No": "(916) 448-8271",
+        //                "Contact": "Bill Knapp",
+        //                "Instrument Count": 10
+        //            },
+        //            {
+        //                "Vendor": "Varec",
+        //                "Phone No": "(510) 521-5000",
+        //                "Contact": "Charles Waters",
+        //                "Instrument Count": 14
+        //            },
+        //            {
+        //                "Vendor": "Vossler",
+        //                "Phone No": "",
+        //                "Contact": "",
+        //                "Instrument Count": 1
+        //            },
+        //            {
+        //                "Vendor": "Wagner Process Equipment",
+        //                "Phone No": "(209) 931-0100",
+        //                "Contact": "John Thorton",
+        //                "Instrument Count": 12
+        //            },
+        //            {
+        //                "Vendor": "Windustrial",
+        //                "Phone No": "",
+        //                "Contact": "",
+        //                "Instrument Count": 2
+        //            }
+        //        ];
+        //    }
+        //});
+
+
+
+    </script>
+    <style>
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+            table thead tr th {
+                text-transform: capitalize;
+            }
+
+            table thead tr:last-child {
+                background: #eaeaea;
+                border-bottom: 4px double #cbcbcb;
+            }
+
+
+
+            table tbody tr:nth-child(even) {
+                background-color: #f2f2f2;
+            }
+
+            table tbody tr.hidden-row {
+                display: none;
+            }
+
+
+        .tableFixHead {
+            overflow: auto;
+            height: 450px;
+            display: block;
+            width: auto;
+        }
+
+            .tableFixHead thead tr th input {
+                width: 100%;
+            }
+
+            .tableFixHead thead, .tableFixHead tbody {
+                width: 100%;
+            }
+
+                .tableFixHead thead tr:first-child th {
+                    position: sticky;
+                    top: 0;
+                    background: lightblue;
+                }
+
+        table.dataTable thead th, table.dataTable thead td {
+            background: lightblue;
+        }
+
+
+
+        .dataTables_scrollHeadInner {
+            width: 100%;
+        }
+
+        div#example_filter input,
+        div#example1_filter input,
+        div#example2_filter input,
+        div#example3_filter input,
+        div#example4_filter input,
+        div#example5_filter input,
+        div#example6_filter input,
+        div#example7_filter input,
+        div#exampleTemp_filter input {
+            background-color: snow;
+        }
+
+        table.display th {
+            font-size: 16px;
+        }
+
+        table.display td {
+            font-size: 14px;
+        }
+
+
+
+
+
+        dataTables_scrollBody {
+            width: auto;
+        }
+
+        datatables_scrollHeadInner {
+            padding-right: 0px;
+        }
+
+        .tab-ctn {
+            display: table;
+            margin: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="tabs">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="widget-tabs-int mg-t-30">
+
+                <div class="tab-hd">
+                    <img class="imgstyle" src="~/Images/pgsvg.svg" alt="" />
+                    <h2 style="font-weight:900">Sacramento Instrument Spec DB</h2>
+                    <div class="sidetab" style="float:right;margin-top:-4%">
+                        <button class="btn" onclick="window.location.href='Index'"><i class="fa fa-home"></i> Home</button>
+                        @*<button class="btn"><i class="fa fa-bars"></i> Menu</button>
+                            <button class="btn"><i class="fa fa-trash"></i> Trash</button>
+                            <button class="btn"><i class="fa fa-close"></i> Close</button>
+                            <button class="btn"><i class="fa fa-folder"></i> Folder</button>*@
+
+
+
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="widget-tabs-list tab-pt-mg">
+                            <ul class="nav nav-tabs tab-nav-center ul_font nav-justified text-justify" role="tablist">
+                                <li><a data-toggle="tab active" href="#home"><i class="fa fa-database"></i> Summary</a></li>
+                                <li><a data-toggle="tab" href="#InstTab"><i class="fa fa-industry" aria-hidden="true"></i> Instruments</a></li>
+
+                                <li><a data-toggle="tab" href="#VendorTab"><i class="fa fa-users" aria-hidden="true"></i> Vendors</a></li>
+                                <li><a data-toggle="tab" href="#ManfTab"><i class="fa fa-cog" aria-hidden="true"></i> Manufacturers</a></li>
+                                <li><a data-toggle="tab" href="#TemplateTab"><i class="fa fa-files-o" aria-hidden="true"></i> Templates</a></li>
+                                <li><a data-toggle="tab" href="#InstypeTab"><i class="fa fa-cogs" aria-hidden="true"></i> Instrument&nbspTypes</a></li>
+                                <li><a data-toggle="tab" href="#InfTab"><i class="fa fa-table" aria-hidden="true"></i> Information&nbspTypes</a></li>
+                                <li><a data-toggle="tab" href="#InfgrpTab"><i class="fa fa-object-group" aria-hidden="true"></i> Information&nbspGroups</a></li>
+                                <li><a data-toggle="tab" href="#LoopTab"><i class="fa fa-files-o" aria-hidden="true"></i> Loops</a></li>
+                            </ul>
+                            <div class="tab-content tab-custom-st">
+                                <div id="home" class="tab-pane in active animated zoomInLeft">
+                                    <div class="tab-ctn p-t-5">
+
+                                        @*<div class="sidetab" style="float:right;">
+                                                <button class="btn"  style="background-color:#0037B1;color:snow"><i class="fa fa-arrows-v"></i> Import/Export</button>
+                                                <br />
+
+                                            </div>*@
+                                        @*<p style="font-size:13px">Instrument Information</p>
+                                            <p class="tab-mg-b-0" style="font-size:13px">All Instruments Information</p>*@
+                                        <div>
+
+                                            <table id="example" class="display" style="width:100%">
+
+                                                <thead>
+                                                    <tr>
+                                                        @foreach (DataColumn col in Model.Tables[0].Columns)
+                                                        {
+                                                             <th>@col.ColumnName</th>
+                                                        }
+                                                        
+                                                    </tr>
+
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (DataRow row in Model.Tables[0].Rows)
+                                                    {
+                                                <tr>
+                                                    @foreach (DataColumn col in Model.Tables[0].Columns)
+                                                    {
+                                                <td>@row[col.ColumnName]</td>
+                                                }
+                                                </tr>}
+                                                </tbody>
+
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="InstTab" class="tab-pane animated zoomInLeft">
+                                    <div class="tab-ctn p-t-5">
+                                        @*<p>this is menu2 content</p>
+                                            <p class="tab-mg-b-0">this is menu2 content</p>*@
+                                        <table id="example1" class="display tableFixHead" width="100%" cellspacing="0" cellpadding="0">
+                                        
+                                        <thead>
+                                            <tr>
+                                                @foreach (DataColumn col in Model.Tables[1].Columns)
+                                                {
+                                                    <th>@col.ColumnName</th>
+                                                }
+                                            </tr>
+                                                </thead>
+                                        <tbody>
+                                            @foreach (DataRow row in Model.Tables[1].Rows)
+                                            {
+                                                <tr>
+                                                    @foreach (DataColumn col in Model.Tables[1].Columns)
+                                                    {
+                                                        <td>@row[col.ColumnName]</td>
+                                                    }
+                                                </tr>
+}
+                                        </tbody>
+                                            </table>
+                                    </div>
+                                </div>
+                                <div id="VendorTab" class="tab-pane animated zoomInLeft">
+                                    <div class="tab-ctn">
+                                        @*<p>this is menu3 content</p>
+                                            <p class="tab-mg-b-0">this is maincontent in menu3.</p>*@
+                                        <table id="example2" class="display tableFixHead" width="100%" cellspacing="0" cellpadding="0">
+                                        
+                                        <thead>
+                                            <tr>
+                                                @foreach (DataColumn col in Model.Tables[2].Columns)
+                                                {
+                                                    <th>@col.ColumnName</th>
+                                                }
+                                            </tr>
+                                                </thead>
+                                        <tbody>
+                                            @foreach (DataRow row in Model.Tables[2].Rows)
+                                            {
+                                                <tr>
+                                                    @foreach (DataColumn col in Model.Tables[2].Columns)
+                                                    {
+                                                        <td>@row[col.ColumnName]</td>
+                                                    }
+                                                </tr>
+}
+                                        </tbody>
+
+                                            </table>
+                                    </div>
+                                </div>
+                                <div id="ManfTab" class="tab-pane">
+                                    <div class="tab-ctn">
+                                        @*<p>this is content in menu4</p>
+                                            <p class="tab-mg-b-0">this is maincontent in menu4.</p>*@
+                                        <div class="tablescenter">
+                                            <table id="example3" class="display tableFixHead" width="100%">
+
+                                                <thead>
+                                                    <tr>
+
+                                                        @foreach (DataColumn col in Model.Tables[3].Columns)
+                                                        {
+                                                            <th>@col.ColumnName</th>
+                                                        }
+
+                                                    </tr>
+                                                    </thead>
+                                                <tbody>
+
+                                                    @foreach (DataRow row in Model.Tables[3].Rows)
+                                                    {
+                                                        <tr>
+                                                            @foreach (DataColumn col in Model.Tables[3].Columns)
+                                                            {
+                                                                <td>@row[col.ColumnName]</td>
+                                                            }
+                                                        </tr>
+}
+                                                </tbody>
+
+
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="TemplateTab" class="tab-pane">
+                                    <div class="tab-ctn">
+                                        @*<p>this is content in menu4</p>
+                                            <p class="tab-mg-b-0">this is maincontent in menu4.</p>*@
+                                        <table id="exampleTemp" class="display" style="width:100%">
+                                            <thead>
+                                                <tr>
+                                                    @foreach (DataColumn col in Model.Tables[4].Columns)
+                                                    {
+                                                        <th>@col.ColumnName</th>
+                                                    }
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (DataRow row in Model.Tables[4].Rows)
+                                                {
+                                                    <tr>
+                                                        @foreach (DataColumn col in Model.Tables[4].Columns)
+                                                        {
+                                                            <td>@row[col.ColumnName]</td>
+                                                        }
+                                                    </tr>
+}
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+                                </div>
+                                <div id="InstypeTab" class="tab-pane animated zoomInLeft">
+                                    <div class="tab-ctn">
+                                        @*<p>this is menu5 content</p>
+                                            <p class="tab-mg-b-0">this is maincontent in menu5</p>*@
+                                        <table id="example4" class="display" style="width:100%" responsive="scroll">
+                                            <thead>
+                                                <tr>
+                                                    @foreach (DataColumn col in Model.Tables[5].Columns)
+                                                    {
+                                                        <th>@col.ColumnName</th>
+                                                    }
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (DataRow row in Model.Tables[5].Rows)
+                                                {
+                                                    <tr>
+                                                        @foreach (DataColumn col in Model.Tables[5].Columns)
+                                                        {
+                                                            <td>@row[col.ColumnName]</td>
+                                                        }
+                                                    </tr>
+}
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+                                </div>
+                                <div id="InfTab" class="tab-pane animated zoomInLeft">
+                                    <div class="tab-ctn">
+                                        @*<p>this is menu6 content</p>
+                                            <p class="tab-mg-b-0">this is maincontent in menu6.</p>*@
+                                        <table id="example5" class="display" style="width:100%" responsive="scroll">
+                                            <thead>
+                                                <tr>
+                                                    @foreach (DataColumn col in Model.Tables[6].Columns)
+                                                    {
+                                                        <th>@col.ColumnName</th>
+                                                    }
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (DataRow row in Model.Tables[6].Rows)
+                                                {
+                                                    <tr>
+                                                        @foreach (DataColumn col in Model.Tables[6].Columns)
+                                                        {
+                                                            <td>@row[col.ColumnName]</td>
+                                                        }
+                                                    </tr>
+}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div id="InfgrpTab" class="tab-pane">
+                                    <div class="tab-ctn">
+                                        @*<p>this is menu6 content</p>
+                                            <p class="tab-mg-b-0">this is maincontent in menu6.</p>*@
+                                        <table id="example6" class="display" style="width:100%" responsive="scroll">
+                                            <thead>
+                                                <tr>
+                                                    @foreach (DataColumn col in Model.Tables[7].Columns)
+                                                    {
+                                                        <th>@col.ColumnName</th>
+                                                    }
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (DataRow row in Model.Tables[7].Rows)
+                                                {
+                                                    <tr>
+                                                        @foreach (DataColumn col in Model.Tables[7].Columns)
+                                                        {
+                                                            <td>@row[col.ColumnName]</td>
+                                                        }
+                                                    </tr>
+}
+                                            </tbody>
+                                        </table>
+
+                                    </div>
+                                </div>
+                                <div id="LoopTab" class="tab-pane animated zoomInLeft">
+                                    <div class="tab-ctn">
+                                        @*<p>this is menu6 content</p>
+                                            <p class="tab-mg-b-0">this is maincontent in menu6.</p>*@
+                                        <table id="example7" class="display" style="width:100%">
+                                            <thead>
+                                                <tr>
+                                                    @foreach (DataColumn col in Model.Tables[8].Columns)
+                                                    {
+                                                        <th>@col.ColumnName</th>
+                                                    }
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+
+                                                @foreach (DataRow row in Model.Tables[8].Rows)
+                                                {
+                                                    <tr>
+                                                        @foreach (DataColumn col in Model.Tables[8].Columns)
+                                                        {
+                                                            <td>@row[col.ColumnName]</td>
+                                                        }
+                                                    </tr>
+}
+                                            </tbody>
+
+                                        </table>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- DataTables -->
+    <script src="../../plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="../../plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="../../plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="../../plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="../../dist/js/adminlte.min.js"></script>
+    <!-- AdminLTE for demo purposes -->
+    <script src="../../dist/js/demo.js"></script>
+    <!-- page script -->
+    @*<script>
+            $(function () {
+                $("#example").DataTable({
+                    "responsive": true,
+                    "autoWidth": false,
+                });
+                $('#example1').DataTable({
+                    "paging": true,
+                    "lengthChange": false,
+                    "searching": false,
+                    "ordering": true,
+                    "info": true,
+                    "autoWidth": false,
+                    "responsive": true,
+                });
+            });
+        </script>*@
+
+</body>
+</html>
