@@ -1,0 +1,138 @@
+﻿@model InstrumentDatabase.Model.AreaModel
+
+@{
+    ViewBag.Title = "Equipment Number Generation Form";
+}
+<h2>Equipment Number Generation </h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+<div class="form-horizontal">
+
+    
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+
+    <div class="form-group">
+        @*@Html.LabelFor(model => model.Area, htmlAttributes: new { @class = "control-label col-md-2" })*@
+        @Html.Label("Area:", htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-4">
+            @*ViewBag.AreaList is holding all the Area values*@
+            @Html.DropDownListFor(model => model.Areas, ViewBag.areas as SelectList, new { @class = "form-control", @onchange = "DropDownAreaList()" })
+            @Html.ValidationMessageFor(model => model.Area, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        @*@Html.LabelFor(model => model.EQ_Type, htmlAttributes: new { @class = "control-label col-md-2" })*@
+        @Html.Label("Equipment Type:", htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-4">
+            @*ViewBag.Eq_Types is holding all the Equipment values*@
+            @Html.DropDownListFor(model => model.Eq_Types, ViewBag.Eq_Types as SelectList, new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.Eq_Type, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+
+
+    <div class="form-group">
+        @*@Html.LabelFor(model => model.Seq_No, htmlAttributes: new { @class = "control-label col-md-2" })*@
+        @Html.Label("Sequence No:", htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-4">
+            @Html.EditorFor(model => model.Seq_No, new { htmlAttributes = new { @class = "form-control", @Value = ViewBag.seq_no } })
+            @Html.ValidationMessageFor(model => model.Seq_No, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @*@Html.LabelFor(model => model.Eq_name, htmlAttributes: new { @class = "control-label col-md-2" })*@
+        @Html.Label("Equipment Name:", htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.Eq_name, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.Eq_name, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+
+
+    <div class="form-group">
+        @*@Html.LabelFor(model => model.PIDNo, htmlAttributes: new { @class = "control-label col-md-2" })*@
+        @Html.Label("P&ID No:", htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.PIDNo, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.PIDNo, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        @*@Html.LabelFor(model => model.Areas2, htmlAttributes: new { @class = "control-label col-md-2" })*@
+        @Html.Label("Area2:", htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @*ViewBag.Area2List is holding all the Area2 values*@
+            @Html.DropDownListFor(model => model.Areas2, ViewBag.Areas2 as SelectList, new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.Areas2, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @*@Html.LabelFor(model => model.Requestor, htmlAttributes: new { @class = "control-label col-md-2" })*@
+        @Html.Label("Requestor:", htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.Requestor, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.Requestor, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        @*@Html.LabelFor(model => model.Project_Name, htmlAttributes: new { @class = "control-label col-md-2" })*@
+        @Html.Label("Project Name:", htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.Project_Name, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.Project_Name, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Save" class="btn btn-default" />
+            <input type="submit" value="Cancel" class="btn btn-default" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10" style="color:green">
+            @ViewBag.Message
+
+        </div>
+    </div>
+    
+    </div>
+  }
+
+    
+
+    @section Scripts {
+        @Scripts.Render("~/bundles/jqueryval")
+    }
+
+    
+
+    <script>
+
+        //To get selected value an text of dropdownlist
+        function SelectedValue(ddlObject) {
+            //Selected value of dropdownlist
+            var selectedValue = ddlObject.value;
+            //Selected text of dropdownlist
+            var selectedText = ddlObject.options[ddlObject.selectedIndex].innerHTML;
+
+            //alert popup with detail of seleceted value and text
+            alert(" Selected Value: " + selectedValue + " -- " + "Selected Text: " + selectedText);
+        }
+    </script>
+ </div>
