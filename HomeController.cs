@@ -1,4 +1,4 @@
-﻿using DataTableExample.Model;
+﻿
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -7,11 +7,15 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using InstrumentDatabase.Model;
 
 namespace InstrumentDatabase.Controllers
 {
     public class HomeController : Controller
     {
+        string ConnectionString = ConfigurationManager.ConnectionStrings["cons"].ConnectionString;
+
+        //SqlConnection con = new SqlConnection(ConnectionString);
 
         DataSet dsFinalTable = new DataSet();
         public ActionResult Index()
@@ -154,9 +158,7 @@ namespace InstrumentDatabase.Controllers
 
         private DataTable LoopTableView()
         {
-            string connectionString = string.Empty;
-            string ConnectionString = ConfigurationManager.ConnectionStrings["cons"].ConnectionString;
-
+            
             SqlConnection con = new SqlConnection(ConnectionString);
 
             SqlCommand cmdInstrumentCount = new SqlCommand("select distinct [Vendor],[Vendor_Contact],[Vendor_PhoneNo], count(*) FROM [InstrumentDatabase].[dbo].[Instruments] GROUP BY [Vendor],[Vendor_Contact],[Vendor_PhoneNo]", con);
@@ -172,12 +174,9 @@ namespace InstrumentDatabase.Controllers
             return FinalTable;
         }
 
-
         private DataTable ManufacturerTableView()
         {
-            string connectionString = string.Empty;
-
-            string ConnectionString = ConfigurationManager.ConnectionStrings["cons"].ConnectionString;
+           
 
             SqlConnection con = new SqlConnection(ConnectionString);
 
@@ -196,10 +195,6 @@ namespace InstrumentDatabase.Controllers
 
         private DataTable VendorTableView()
         {
-            string connectionString = string.Empty;
-
-            string ConnectionString = ConfigurationManager.ConnectionStrings["cons"].ConnectionString;
-
             SqlConnection con = new SqlConnection(ConnectionString);
 
             //SqlCommand cmdInstrumentCount = new SqlCommand("select Instrument_type,Area ,count(*) as Instrument_Count from Instruments group by Area,Instrument_Type order by Instrument_Type,Area", con);
@@ -224,9 +219,7 @@ namespace InstrumentDatabase.Controllers
 
         private DataTable InstrumentsTableView()
         {
-            string connectionString = string.Empty;
-
-            string ConnectionString = ConfigurationManager.ConnectionStrings["cons"].ConnectionString;
+           
 
             SqlConnection con = new SqlConnection(ConnectionString);
 
@@ -249,7 +242,7 @@ namespace InstrumentDatabase.Controllers
         /// </summary>
         private DataTable EquipmentData()
         {
-            SqlConnection con = new SqlConnection("data source =.; database = InstrumentDatabase; integrated security = SSPI");
+            SqlConnection con = new SqlConnection(ConnectionString);
             SqlCommand cmd_AreaLst = new SqlCommand("select * from EquipmentTag  where SNo is not null;", con);
             SqlDataAdapter daArea_Lst = new SqlDataAdapter(cmd_AreaLst);
             DataTable dtArea_Lst = new DataTable();
@@ -267,8 +260,7 @@ namespace InstrumentDatabase.Controllers
         private DataTable HomeTabTableView()
         {
 
-            string ConnectionString = ConfigurationManager.ConnectionStrings["cons"].ConnectionString;
-
+            
             SqlConnection con = new SqlConnection(ConnectionString);
 
             SqlCommand cmdInstrumentCount = new SqlCommand("select Instrument_type,Area ,count(*) as Instrument_Count from Instruments group by Area,Instrument_Type order by Instrument_Type,Area", con);
@@ -571,7 +563,7 @@ namespace InstrumentDatabase.Controllers
         private DataTable GetEquipmentData()
         {
             DataTable DT_EquipmentData = new DataTable();
-            SqlConnection con = new SqlConnection("data source =.; database = InstrumentDatabase; integrated security = SSPI");
+            SqlConnection con = new SqlConnection(ConnectionString);
             string EquipmentData_Str = "select SNo,Area,Eq_Type,Tag,P_ID,Eq,FLC_as_in_Eq_List,FLC_in_FLOC,Area2,Remarks from EquipmentTag  where SNo is not null;";
             SqlCommand cmdEquipmentData = new SqlCommand(EquipmentData_Str, con);
             SqlDataAdapter daEquipmentData = new SqlDataAdapter(cmdEquipmentData);
@@ -582,48 +574,55 @@ namespace InstrumentDatabase.Controllers
         public ActionResult Instrument()
         {
             DataTable DT_InstrumentData = new DataTable();
-            SqlConnection con = new SqlConnection("data source =.; database = InstrumentDatabase; integrated security = SSPI");
+            SqlConnection con = new SqlConnection(ConnectionString);
             SqlCommand cmdInstrumentData = new SqlCommand("select *from InstrumentData", con);
             SqlDataAdapter daInstrumentData = new SqlDataAdapter(cmdInstrumentData);
             daInstrumentData.Fill(DT_InstrumentData);
             return View(DT_InstrumentData);
         }
 
-        public static AreaModel cMainareamodel;
+
+
+       [HttpGet]
         public ActionResult EquipForm()
         {
+            AreaModel cMainareamodel = new AreaModel();
+            SqlConnection con = new SqlConnection(ConnectionString);
 
-            AreaModel objAreamodel = new AreaModel();
-            cMainareamodel = new AreaModel();
-            objAreamodel.Areas = cMainareamodel.Areas = FillList();
-            //ViewBag.lblArea = "";
+            List<SelectListItem> areas = new List<SelectListItem>();
 
-
-            List<string> Area_Lst = new List<string>();
-            SqlConnection con = new SqlConnection("data source =.; database = InstrumentDatabase; integrated security = SSPI");
             SqlCommand cmd_AreaLst = new SqlCommand("select distinct area from EquipmentTag  where SNo is not null;", con);
             SqlDataAdapter daArea_Lst = new SqlDataAdapter(cmd_AreaLst);
             DataTable dtArea_Lst = new DataTable();
             daArea_Lst.Fill(dtArea_Lst);
+
             for (int i = 0; i < dtArea_Lst.Rows.Count; i++)
             {
-                Area_Lst.Add(dtArea_Lst.Rows[i]["Area"].ToString());
+                //cMainareamodel.Areas.Add(new SelectListItem { Text = dtArea_Lst.Rows[i]["area"].ToString(), Value = dtArea_Lst.Rows[i]["area"].ToString() });
+                areas.Add(new SelectListItem { Text = dtArea_Lst.Rows[i]["area"].ToString(), Value = dtArea_Lst.Rows[i]["area"].ToString() });
             }
-            ViewData["Area"] = Area_Lst;
-            ViewBag.Area_Lst = Area_Lst;
-            //MyEntities e = new MyEntities();
+            //ViewData["ListItems"] = Area_Lst;
+
+            ViewBag.areas = areas;
 
 
-            #region EquipmentType
+            List<SelectListItem> Areas2 = new List<SelectListItem>();
 
-            int Area = 0;
-            string EqType = "select distinct Eq_Type from EquipmentTag where area=" + Area;
-            SqlCommand cmd_EqType = new SqlCommand(EqType, con);
-            SqlDataAdapter daEqType = new SqlDataAdapter(cmd_EqType);
-            DataTable dtEqType = new DataTable();
-            daEqType.Fill(dtEqType);
+            SqlCommand cmd_Area2Lst = new SqlCommand("select distinct area2 from EquipmentTag  where SNo is not null;", con);
+            SqlDataAdapter daArea2_Lst = new SqlDataAdapter(cmd_Area2Lst);
+            DataTable dtArea2_Lst = new DataTable();
+            daArea2_Lst.Fill(dtArea2_Lst);
 
-            #endregion
+            for (int i = 0; i < dtArea2_Lst.Rows.Count; i++)
+            {
+                //cMainareamodel.Areas.Add(new SelectListItem { Text = dtArea_Lst.Rows[i]["area"].ToString(), Value = dtArea_Lst.Rows[i]["area"].ToString() });
+                Areas2.Add(new SelectListItem { Text = dtArea2_Lst.Rows[i]["area2"].ToString(), Value = dtArea2_Lst.Rows[i]["area2"].ToString() });
+            }
+            //ViewData["ListItems"] = Area_Lst;
+
+            ViewBag.Areas2 = Areas2;
+
+            DropDownAreaList();
 
             #region SequenceNo
 
@@ -632,23 +631,77 @@ namespace InstrumentDatabase.Controllers
             SqlDataAdapter daSequenceNo = new SqlDataAdapter(cmdSequenceNo);
             DataTable dtSequenceNo = new DataTable();
             daSequenceNo.Fill(dtSequenceNo);
+            int Seq_no = Convert.ToInt32(dtSequenceNo.Rows[0]["Sequence"].ToString());
+            Seq_no = Seq_no + 1;
+            cMainareamodel.Seq_No = Seq_no;
+            ViewBag.seq_no = Seq_no;
+
             #endregion
 
-            //return View(Area_Lst);
-
-            return View(objAreamodel);
+            return View();
         }
-
 
         [HttpPost]
-        public ActionResult Index(AreaModel areamodel)
+        public ActionResult EquipForm(AreaModel obj)
         {
-            var g = cMainareamodel.Areas;
-            var selectedCountry = g.Find(p => p.Value == areamodel.Areaid.ToString());
-            areamodel.Areas = FillList();
-            ViewBag.LblCountry = "You selected " + selectedCountry.Text.ToString();
-            return View(areamodel);
+            try
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors);
+                if (ModelState.IsValid)
+                {
+                    if (AddEquipmentTypeDetails(obj))
+                    {
+                        ViewBag.Message = "Employee details added successfully";
+                    }
+                }
+
+                return View();
+            }
+            catch (Exception ex)
+            {
+                return View();
+            }
         }
+
+
+        
+        public ActionResult DropDownAreaList()
+        {
+            AreaModel cMainareamodel = new AreaModel();
+            SqlConnection con = new SqlConnection(ConnectionString);
+            List<SelectListItem> Eq_Types = new List<SelectListItem>();
+            //int Area = Convert.ToInt32(Request.Form["ddlArea"].ToString());
+            string EqType = "select distinct Eq_Type from EquipmentTag";
+            SqlCommand cmd_EqType = new SqlCommand(EqType, con);
+            SqlDataAdapter daEqType = new SqlDataAdapter(cmd_EqType);
+            DataTable dtEqType = new DataTable();
+            daEqType.Fill(dtEqType);
+            for (int i = 0; i < dtEqType.Rows.Count; i++)
+            {
+                //cMainareamodel.Eq_Types.Add(new SelectListItem { Text = dtEqType.Rows[i]["Eq_Type"].ToString(), Value = dtEqType.Rows[i]["Eq_Type"].ToString() });
+                Eq_Types.Add(new SelectListItem { Text = dtEqType.Rows[i]["Eq_Type"].ToString(), Value = dtEqType.Rows[i]["Eq_Type"].ToString() });
+            }
+            cMainareamodel.Eq_Types = Eq_Types;
+            //ViewData["EqTypeListItems"] = LstEqType;
+            ViewBag.Eq_Types = Eq_Types;
+
+
+            
+
+            return View();
+            
+        }
+
+        //[HttpPost]
+        //public ActionResult Index(AreaModel areamodel)
+        //{
+        //    AreaModel cMainareamodel = new AreaModel();
+        //    var g = cMainareamodel.Areas;
+        //    var selectedCountry = g.Find(p => p.Value == areamodel.Areaid.ToString());
+        //    areamodel.Areas = FillList();
+        //    ViewBag.LblCountry = "You selected " + selectedCountry.Text.ToString();
+        //    return View(areamodel);
+        //}
 
         private List<SelectListItem> FillList()
         {
@@ -700,5 +753,160 @@ namespace InstrumentDatabase.Controllers
         {
             return View();
         }
+
+        [HttpGet]
+        public ActionResult EquipmentNumberGeneration()
+        {
+            AreaModel cMainareamodel = new AreaModel();
+            SqlConnection con = new SqlConnection(ConnectionString);
+
+            List<SelectListItem> Area_Lst = new List<SelectListItem>();
+
+            SqlCommand cmd_AreaLst = new SqlCommand("select distinct area from EquipmentTag  where SNo is not null;", con);
+            SqlDataAdapter daArea_Lst = new SqlDataAdapter(cmd_AreaLst);
+            DataTable dtArea_Lst = new DataTable();
+            daArea_Lst.Fill(dtArea_Lst);
+
+            for (int i = 0; i < dtArea_Lst.Rows.Count; i++)
+            {
+                //cMainareamodel.Areas.Add(new SelectListItem { Text = dtArea_Lst.Rows[i]["area"].ToString(), Value = dtArea_Lst.Rows[i]["area"].ToString() });
+                Area_Lst.Add(new SelectListItem { Text = dtArea_Lst.Rows[i]["area"].ToString(), Value = dtArea_Lst.Rows[i]["area"].ToString() });
+                cMainareamodel.Area = dtArea_Lst.Rows[i]["area"].ToString();
+                cMainareamodel.Areaid = dtArea_Lst.Rows[i]["area"].ToString();
+            }
+            //ViewData["ListItems"] = Area_Lst;
+            cMainareamodel.Areas = Area_Lst;
+            ViewBag.areas = Area_Lst;
+
+
+            List<SelectListItem> Area2_Lst = new List<SelectListItem>();
+
+            SqlCommand cmd_Area2Lst = new SqlCommand("select distinct area2 from EquipmentTag  where SNo is not null;", con);
+            SqlDataAdapter daArea2_Lst = new SqlDataAdapter(cmd_Area2Lst);
+            DataTable dtArea2_Lst = new DataTable();
+            daArea2_Lst.Fill(dtArea2_Lst);
+
+            for (int i = 0; i < dtArea2_Lst.Rows.Count; i++)
+            {
+                //cMainareamodel.Areas.Add(new SelectListItem { Text = dtArea_Lst.Rows[i]["area"].ToString(), Value = dtArea_Lst.Rows[i]["area"].ToString() });
+                Area2_Lst.Add(new SelectListItem { Text = dtArea2_Lst.Rows[i]["area2"].ToString(), Value = dtArea2_Lst.Rows[i]["area2"].ToString() });
+            }
+            //ViewData["ListItems"] = Area_Lst;
+            cMainareamodel.Areas2 = Area2_Lst;
+            ViewBag.Areas2 = Area2_Lst;
+
+
+
+
+            List<SelectListItem> EQ_Lst = new List<SelectListItem>();
+
+           // string RawUrl = Request.RawUrl;
+            
+                //string substr = RawUrl.Substring(RawUrl.Length - 2);
+                DropDownAreaList();
+            
+           
+                
+                EQ_Lst.Add(new SelectListItem { Text = "--select--", Value = "--select--" });
+                cMainareamodel.Eq_Types = EQ_Lst;
+                //ViewBag.Eq_Types = EQ_Lst;
+                //ViewData["EqTypeListItems"] = EQ_Lst;
+            
+            //return View(Area_Lst);
+
+
+            #region SequenceNo
+
+            string str_SequenceNo = "SELECT MAX(Tag) as Sequence FROM EquipmentTag where SNo is not null";
+            SqlCommand cmdSequenceNo = new SqlCommand(str_SequenceNo, con);
+            SqlDataAdapter daSequenceNo = new SqlDataAdapter(cmdSequenceNo);
+            DataTable dtSequenceNo = new DataTable();
+            daSequenceNo.Fill(dtSequenceNo);
+            int Seq_no = Convert.ToInt32(dtSequenceNo.Rows[0]["Sequence"].ToString());
+            Seq_no = Seq_no + 1;
+            cMainareamodel.Seq_No = Seq_no;
+            ViewBag.seq_no = Seq_no;
+
+            #endregion
+
+
+            return View();
+        }
+
+
+        [HttpPost]
+        public ActionResult EquipmentNumberGeneration(AreaModel areamdl)
+        {
+            try
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors);
+
+                for(int r=0;r<=ModelState.Values.Count;r++)
+                {
+                    //string val = ModelState.Values.ElementAt<r>.ToString();
+                }
+                if (ModelState.IsValid)
+                {
+                    if (AddEquipmentTypeDetails(areamdl))
+                    {
+                        ViewBag.Message = "Employee details added successfully";
+                    }
+                }
+
+                return View();
+            }
+            catch(Exception ex)
+            {
+                return View();
+            }
+        }
+
+
+        //To Add Equipment details
+        public bool AddEquipmentTypeDetails(AreaModel obj)
+        {
+            try
+            {
+                SqlConnection con = new SqlConnection(ConnectionString);
+
+                //15-C-5564
+                List<SelectListItem> Area = ViewBag.Area;
+                
+                string EQ = obj.Areas + "-" + obj.Eq_Types + "-" + obj.Seq_No;
+                SqlCommand cmd_InsertEqDetails = new SqlCommand("InsertEquipmentType", con);
+                cmd_InsertEqDetails.CommandType = CommandType.StoredProcedure;
+                cmd_InsertEqDetails.Parameters.AddWithValue("@Area", obj.Area);
+                cmd_InsertEqDetails.Parameters.AddWithValue("@Eq_Type", obj.Eq_Types);
+                cmd_InsertEqDetails.Parameters.AddWithValue("@Tag", obj.Seq_No);
+                cmd_InsertEqDetails.Parameters.AddWithValue("@P_ID", obj.PIDNo);
+                cmd_InsertEqDetails.Parameters.AddWithValue("@Eq", EQ);
+                cmd_InsertEqDetails.Parameters.AddWithValue("@Area2", obj.Areas2);
+                cmd_InsertEqDetails.Parameters.AddWithValue("@Equipment_Name", obj.Eq_name);
+                cmd_InsertEqDetails.Parameters.AddWithValue("@Requestor", obj.Requestor);
+                cmd_InsertEqDetails.Parameters.AddWithValue("@Project_Name", obj.Project_Name);
+
+                con.Open();
+                int i = cmd_InsertEqDetails.ExecuteNonQuery();
+                con.Close();
+                if (i >= 1)
+                {
+
+                    return true;
+
+                }
+                else
+                {
+
+                    return false;
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+         }
+
     }
 }

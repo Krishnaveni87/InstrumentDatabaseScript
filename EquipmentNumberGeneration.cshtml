@@ -20,7 +20,7 @@
         @Html.Label("Area:", htmlAttributes: new { @class = "control-label col-md-2" })
         <div class="col-md-4">
             @*ViewBag.AreaList is holding all the Area values*@
-            @Html.DropDownListFor(model => model.Areas, ViewBag.areas as SelectList, new { @class = "form-control", @onchange = "DropDownAreaList()" })
+            @Html.DropDownListFor(model => model.Areas, (IEnumerable<SelectListItem>) ViewBag.areas , new { @class = "form-control", @onchange = "DropDownAreaList()" })
             @Html.ValidationMessageFor(model => model.Area, "", new { @class = "text-danger" })
         </div>
     </div>
@@ -31,7 +31,7 @@
         @Html.Label("Equipment Type:", htmlAttributes: new { @class = "control-label col-md-2" })
         <div class="col-md-4">
             @*ViewBag.Eq_Types is holding all the Equipment values*@
-            @Html.DropDownListFor(model => model.Eq_Types, ViewBag.Eq_Types as SelectList, new { @class = "form-control" })
+            @Html.DropDownListFor(model => model.Eq_Types, (IEnumerable<SelectListItem>) ViewBag.Eq_Types , new { @class = "form-control" })
             @Html.ValidationMessageFor(model => model.Eq_Type, "", new { @class = "text-danger" })
         </div>
     </div>
@@ -73,7 +73,7 @@
         @Html.Label("Area2:", htmlAttributes: new { @class = "control-label col-md-2" })
         <div class="col-md-10">
             @*ViewBag.Area2List is holding all the Area2 values*@
-            @Html.DropDownListFor(model => model.Areas2, ViewBag.Areas2 as SelectList, new { @class = "form-control" })
+            @Html.DropDownListFor(model => model.Areas2  , (IEnumerable<SelectListItem>) ViewBag.Areas2 , new { @class = "form-control" })
             @Html.ValidationMessageFor(model => model.Areas2, "", new { @class = "text-danger" })
         </div>
     </div>
