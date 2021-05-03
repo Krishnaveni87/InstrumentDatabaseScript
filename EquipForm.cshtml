@@ -105,7 +105,7 @@
                                     @Html.Label("Area:", htmlAttributes: new { @class = "control-label col-md-2" })
                                     @*ViewBag.AreaList is holding all the Area values*@
                                     @Html.DropDownListFor(model => model.Areas, (IEnumerable<SelectListItem>) ViewBag.areas, new { @class = "form-control", @onchange = "DropDownAreaList()" })
-                                    @Html.ValidationMessageFor(model => model.Area, "", new { @class = "text-danger" })
+                                    @Html.ValidationMessageFor(model => model.Areas, "", new { @class = "text-danger" })
                                 </div>
 
                                 <div class="form -group">
@@ -128,7 +128,7 @@
                                     @Html.Label("Equipment Type:", htmlAttributes: new { @class = "control-label col-md-2" })
                                     @*ViewBag.Eq_Types is holding all the Equipment values*@
                                     @Html.DropDownListFor(model => model.Eq_Types, (IEnumerable<SelectListItem>) ViewBag.Eq_Types, new { @class = "form-control" })
-                                    @Html.ValidationMessageFor(model => model.Eq_Type, "", new { @class = "text-danger" })
+                                    @Html.ValidationMessageFor(model => model.Eq_Types, "", new { @class = "text-danger" })
                                 </div>
                                 <!-- /.form-group -->
                                 <div class="form-group">

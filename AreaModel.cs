@@ -14,10 +14,10 @@ namespace InstrumentDatabase.Model
         public IEnumerable<SelectListItem> Areas { get; set; }
 
 
-        [Required(ErrorMessage = "Area2 is required.")]
-        public string Area { get; set; }
+       // [Required(ErrorMessage = "Area2 is required.")]
+        //public string Area { get; set; }
 
-        public string Areaid { get; set; }
+        //public string Areaid { get; set; }
 
 
         [Required(ErrorMessage = "Area2 is required.")]
@@ -25,17 +25,17 @@ namespace InstrumentDatabase.Model
 
 
 
-        public string Area2 { get; set; }
+        //public string Area2 { get; set; }
 
-        public string Areaid2 { get; set; }
+        //public string Areaid2 { get; set; }
 
 
         [Required(ErrorMessage = "Equipment is required.")]
         public IEnumerable<SelectListItem> Eq_Types { get; set; }
 
-        public string Eq_Type { get; set; }
+        //public string Eq_Type { get; set; }
 
-        public string Eq_Typeid { get; set; }
+        //public string Eq_Typeid { get; set; }
 
         [Required(ErrorMessage = "SequenceNo is required.")]
         public int Seq_No { get; set; }

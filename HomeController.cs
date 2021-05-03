@@ -649,10 +649,10 @@ namespace InstrumentDatabase.Controllers
                 var errors = ModelState.Values.SelectMany(v => v.Errors);
                 if (ModelState.IsValid)
                 {
-                    if (AddEquipmentTypeDetails(obj))
-                    {
-                        ViewBag.Message = "Employee details added successfully";
-                    }
+                    //if (AddEquipmentTypeDetails(string Areas, string Eq_Types, Seq_No, Eq_name, PIDNo, Areas2, Requestor, Project_Name))
+                    //{
+                    //    ViewBag.Message = "Employee details added successfully";
+                    //}
                 }
 
                 return View();
@@ -757,6 +757,13 @@ namespace InstrumentDatabase.Controllers
         [HttpGet]
         public ActionResult EquipmentNumberGeneration()
         {
+            GetDetailsEquipment();
+
+            return View();
+        }
+
+        private void GetDetailsEquipment()
+        {
             AreaModel cMainareamodel = new AreaModel();
             SqlConnection con = new SqlConnection(ConnectionString);
 
@@ -771,8 +778,8 @@ namespace InstrumentDatabase.Controllers
             {
                 //cMainareamodel.Areas.Add(new SelectListItem { Text = dtArea_Lst.Rows[i]["area"].ToString(), Value = dtArea_Lst.Rows[i]["area"].ToString() });
                 Area_Lst.Add(new SelectListItem { Text = dtArea_Lst.Rows[i]["area"].ToString(), Value = dtArea_Lst.Rows[i]["area"].ToString() });
-                cMainareamodel.Area = dtArea_Lst.Rows[i]["area"].ToString();
-                cMainareamodel.Areaid = dtArea_Lst.Rows[i]["area"].ToString();
+                //cMainareamodel.Area = dtArea_Lst.Rows[i]["area"].ToString();
+                //cMainareamodel.Areaid = dtArea_Lst.Rows[i]["area"].ToString();
             }
             //ViewData["ListItems"] = Area_Lst;
             cMainareamodel.Areas = Area_Lst;
@@ -800,18 +807,18 @@ namespace InstrumentDatabase.Controllers
 
             List<SelectListItem> EQ_Lst = new List<SelectListItem>();
 
-           // string RawUrl = Request.RawUrl;
-            
-                //string substr = RawUrl.Substring(RawUrl.Length - 2);
-                DropDownAreaList();
-            
-           
-                
-                EQ_Lst.Add(new SelectListItem { Text = "--select--", Value = "--select--" });
-                cMainareamodel.Eq_Types = EQ_Lst;
-                //ViewBag.Eq_Types = EQ_Lst;
-                //ViewData["EqTypeListItems"] = EQ_Lst;
-            
+            // string RawUrl = Request.RawUrl;
+
+            //string substr = RawUrl.Substring(RawUrl.Length - 2);
+            DropDownAreaList();
+
+
+
+            EQ_Lst.Add(new SelectListItem { Text = "--select--", Value = "--select--" });
+            cMainareamodel.Eq_Types = EQ_Lst;
+            //ViewBag.Eq_Types = EQ_Lst;
+            //ViewData["EqTypeListItems"] = EQ_Lst;
+
             //return View(Area_Lst);
 
 
@@ -828,30 +835,65 @@ namespace InstrumentDatabase.Controllers
             ViewBag.seq_no = Seq_no;
 
             #endregion
-
-
-            return View();
         }
-
 
         [HttpPost]
         public ActionResult EquipmentNumberGeneration(AreaModel areamdl)
         {
             try
             {
+                GetDetailsEquipment();
+                areamdl.Areas = ViewBag.areas;
                 var errors = ModelState.Values.SelectMany(v => v.Errors);
-
-                for(int r=0;r<=ModelState.Values.Count;r++)
+                string Areas = string.Empty;
+                string Eq_Types = string.Empty;
+                string Seq_No = string.Empty;
+                string Eq_name = string.Empty;
+                string PIDNo = string.Empty;
+                string Areas2 = string.Empty;
+                string Requestor = string.Empty;
+                string Project_Name = string.Empty;
+                foreach (var key in ViewData.ModelState.Keys)
                 {
-                    //string val = ModelState.Values.ElementAt<r>.ToString();
-                }
-                if (ModelState.IsValid)
-                {
-                    if (AddEquipmentTypeDetails(areamdl))
+                    string  modelStateVal = ViewData.ModelState[key].ToString();
+                    var currentKeyValue = ModelState[key].Value.AttemptedValue;
+                    switch (key)
                     {
-                        ViewBag.Message = "Employee details added successfully";
+                        case "Areas":
+                            Areas = currentKeyValue;
+                            break;
+                        case "Eq_Types":
+                            Eq_Types = currentKeyValue;
+                            break;
+                        case "Seq_No":
+                            Seq_No = currentKeyValue;
+                            break;
+                        case "Eq_name":
+                            Eq_name = currentKeyValue;
+                            break;
+                        case "PIDNo":
+                            PIDNo = currentKeyValue;
+                            break;
+                        case "Areas2":
+                            Areas2 = currentKeyValue;
+                            break;
+                        case "Requestor":
+                            Requestor = currentKeyValue;
+                            break;
+                        case "Project_Name":
+                            Project_Name = currentKeyValue;
+                            break;
+                        default:
+                            Console.WriteLine("Unknown value");
+                            break;
                     }
+
                 }
+                    if (AddEquipmentTypeDetails(Areas,Eq_Types,Seq_No,Eq_name,PIDNo,Areas2,Requestor,Project_Name))
+                    {
+                        ViewBag.Message = "Equipment  details added successfully";
+                    }
+                
 
                 return View();
             }
@@ -863,7 +905,7 @@ namespace InstrumentDatabase.Controllers
 
 
         //To Add Equipment details
-        public bool AddEquipmentTypeDetails(AreaModel obj)
+        public bool AddEquipmentTypeDetails(string Areas, string Eq_Types, string  Seq_No, string Eq_name, string PIDNo, string Areas2, string Requestor, string  Project_Name)
         {
             try
             {
@@ -872,18 +914,18 @@ namespace InstrumentDatabase.Controllers
                 //15-C-5564
                 List<SelectListItem> Area = ViewBag.Area;
                 
-                string EQ = obj.Areas + "-" + obj.Eq_Types + "-" + obj.Seq_No;
+                string EQ = Areas + "-" + Eq_Types + "-" + Seq_No;
                 SqlCommand cmd_InsertEqDetails = new SqlCommand("InsertEquipmentType", con);
                 cmd_InsertEqDetails.CommandType = CommandType.StoredProcedure;
-                cmd_InsertEqDetails.Parameters.AddWithValue("@Area", obj.Area);
-                cmd_InsertEqDetails.Parameters.AddWithValue("@Eq_Type", obj.Eq_Types);
-                cmd_InsertEqDetails.Parameters.AddWithValue("@Tag", obj.Seq_No);
-                cmd_InsertEqDetails.Parameters.AddWithValue("@P_ID", obj.PIDNo);
+                cmd_InsertEqDetails.Parameters.AddWithValue("@Area", Areas);
+                cmd_InsertEqDetails.Parameters.AddWithValue("@Eq_Type", Eq_Types);
+                cmd_InsertEqDetails.Parameters.AddWithValue("@Tag", Seq_No);
+                cmd_InsertEqDetails.Parameters.AddWithValue("@P_ID", PIDNo);
                 cmd_InsertEqDetails.Parameters.AddWithValue("@Eq", EQ);
-                cmd_InsertEqDetails.Parameters.AddWithValue("@Area2", obj.Areas2);
-                cmd_InsertEqDetails.Parameters.AddWithValue("@Equipment_Name", obj.Eq_name);
-                cmd_InsertEqDetails.Parameters.AddWithValue("@Requestor", obj.Requestor);
-                cmd_InsertEqDetails.Parameters.AddWithValue("@Project_Name", obj.Project_Name);
+                cmd_InsertEqDetails.Parameters.AddWithValue("@Area2", Areas2);
+                cmd_InsertEqDetails.Parameters.AddWithValue("@Equipment_Name", Eq_name);
+                cmd_InsertEqDetails.Parameters.AddWithValue("@Requestor", Requestor);
+                cmd_InsertEqDetails.Parameters.AddWithValue("@Project_Name",Project_Name);
 
                 con.Open();
                 int i = cmd_InsertEqDetails.ExecuteNonQuery();
