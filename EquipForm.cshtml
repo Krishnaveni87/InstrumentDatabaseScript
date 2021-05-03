@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿
+@model InstrumentDatabase.Model.AreaModel
+
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
@@ -18,18 +21,57 @@
     <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
     <!-- Google Font: Source Sans Pro -->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+
+    <script type="text/javascript">
+
+        function DropDownAreaList() {
+
+            var DropDownSelectedValue = $("#ddlArea :selected").val();
+
+            //You can check selected value using alert
+
+            //alert(DropDownSelectedValue);
+
+            if (DropDownSelectedValue != null) {
+
+                //Make a ajax call to controller here
+
+                $.ajax({
+
+                    Url: " /Home/DropDownAreaList ",
+
+                    data: { "ID": DropDownSelectedValue },
+
+                    success: function (response) {
+
+                    },
+
+                    error: function (xhr) {
+
+                        alert("Something went wrong, please try again");
+
+                    }
+
+                });
+
+            }
+
+        }
+
+    </script>
+
 </head>
 <body style="background-color:#a8e2ff">
 
 
     <!-- Content Wrapper. Contains page content -->
-    <div class="wrapper" >
+    <div class="wrapper">
         <!-- Content Header (Page header) -->
         <section class="content-header">
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <img class="imgstyle" src="~/Images/pgsvg.svg" alt="" style="width:10%"/>
+                        <img class="imgstyle" src="~/Images/pgsvg.svg" alt="" style="width:10%" />
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
@@ -43,7 +85,7 @@
         </section>
 
         <!-- Main content -->
-        <section class="content" >
+        <section class="content">
             <div class="container-fluid">
                 <!-- SELECT2 EXAMPLE -->
                 <div class="card card-default">
@@ -60,40 +102,22 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label>Area</label>
-
-                                    <select class="form-control select2" style="width: 100%;">
-                                        <option selected="selected"></option>
-                                        <option>15</option>
-                                        <option>16</option>
-                                        <option>17</option>
-                                    </select>
-                                    <!-- /.input group -->
+                                    @Html.Label("Area:", htmlAttributes: new { @class = "control-label col-md-2" })
+                                    @*ViewBag.AreaList is holding all the Area values*@
+                                    @Html.DropDownListFor(model => model.Areas, (IEnumerable<SelectListItem>) ViewBag.areas, new { @class = "form-control", @onchange = "DropDownAreaList()" })
+                                    @Html.ValidationMessageFor(model => model.Area, "", new { @class = "text-danger" })
                                 </div>
-                                <!-- /.form-group -->
-                                <div class="form-group">
-                                    <label>Equipment Name</label>
 
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-text"></span>
-                                        </div>
-                                        <input type="text" class="form-control" data-inputmask="'alias': 'ip'" data-mask>
-                                    </div>
-                                    <!-- /.input group -->
+                                <div class="form -group">
+                                    @Html.Label("Equipment Name:", htmlAttributes: new { @class = "control-label col-md-2" })
+                                    @Html.EditorFor(model => model.Eq_name, new { htmlAttributes = new { @class = "form-control" } })
+                                    @Html.ValidationMessageFor(model => model.Eq_name, "", new { @class = "text-danger" })
                                 </div>
-                                <!-- /.form-group -->
 
                                 <div class="form-group">
-                                    <label>Requestor</label>
-
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-text"></span>
-                                        </div>
-                                        <input type="text" class="form-control" data-inputmask="'alias': 'ip'" data-mask>
-                                    </div>
-                                    <!-- /.input group -->
+                                    @Html.Label("Requestor:", htmlAttributes: new { @class = "control-label col-md-2" })
+                                    @Html.EditorFor(model => model.Requestor, new { htmlAttributes = new { @class = "form-control" } })
+                                    @Html.ValidationMessageFor(model => model.Requestor, "", new { @class = "text-danger" })
                                 </div>
                                 <!-- /.form-group -->
                             </div>
@@ -101,90 +125,58 @@
                             <div class="col-md-4">
 
                                 <div class="form-group">
-                                    <label>Equipment Type</label>
-
-                                    <select class="form-control select2" style="width: 100%;">
-                                        <option selected="selected"></option>
-                                        <option>C</option>
-                                        <option>D</option>
-                                        <option>E</option>
-                                    </select>
-                                    <!-- /.input group -->
+                                    @Html.Label("Equipment Type:", htmlAttributes: new { @class = "control-label col-md-2" })
+                                    @*ViewBag.Eq_Types is holding all the Equipment values*@
+                                    @Html.DropDownListFor(model => model.Eq_Types, (IEnumerable<SelectListItem>) ViewBag.Eq_Types, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.Eq_Type, "", new { @class = "text-danger" })
                                 </div>
                                 <!-- /.form-group -->
                                 <div class="form-group">
-                                    <label>P&ID Number</label>
-
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-text"></span>
-                                        </div>
-                                        <input type="text" class="form-control" data-inputmask="'alias': 'ip'" data-mask>
-                                    </div>
-                                    <!-- /.input group -->
+                                    @Html.Label("P&ID No:", htmlAttributes: new { @class = "control-label col-md-2" })
+                                    @Html.EditorFor(model => model.PIDNo, new { htmlAttributes = new { @class = "form-control" } })
+                                    @Html.ValidationMessageFor(model => model.PIDNo, "", new { @class = "text-danger" })
                                 </div>
                                 <!-- /.form-group -->
                                 <div class="form-group">
-                                    <label>Project</label>
-
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-text"></span>
-                                        </div>
-                                        <input type="text" class="form-control" data-inputmask="'alias': 'ip'" data-mask>
-                                    </div>
-                                    <!-- /.input group -->
+                                    @Html.Label("Project Name:", htmlAttributes: new { @class = "control-label col-md-2" })
+                                    @Html.EditorFor(model => model.Project_Name, new { htmlAttributes = new { @class = "form-control" } })
+                                    @Html.ValidationMessageFor(model => model.Project_Name, "", new { @class = "text-danger" })
                                 </div>
-                                <!-- /.form-group -->
                             </div>
-                            <!-- /.col -->
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Sequence Number</label>
-
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-text"></span>
-                                        </div>
-                                        <input type="text" class="form-control" data-inputmask="'alias': 'ip'" data-mask>
-                                    </div>
-                                    <!-- /.input group -->
-                                </div>
-                                <!-- /.form-group -->
-                                <div class="form-group">
-                                    <label>Area</label>
-                                    <select class="form-control select2" style="width: 100%;">
-                                        <option selected="selected"></option>
-                                        <option>482S</option>
-                                        <option>542E</option>
-                                        <option>512T</option>
-                                    </select>
-
-                                    <!-- /.input group -->
-                                </div>
-                                <!-- /.form-group -->
-
-                            </div>
-                            <!-- /.col -->
-
-
-
-
                         </div>
-                        <!-- /.row -->
-                        <div class="form-group row-cols-2">
+                        <!-- /.col -->
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                @Html.Label("Sequence No:", htmlAttributes: new { @class = "control-label col-md-2" })
+                                @Html.EditorFor(model => model.Seq_No, new { htmlAttributes = new { @class = "form-control", @Value = ViewBag.seq_no } })
+                                @Html.ValidationMessageFor(model => model.Seq_No, "", new { @class = "text-danger" })
+                            </div>
 
-                            <button type="submit" class="btn btn-default float-right" style="margin-left:30px;" onclick="window.location.href='../Home/Equipment';">Cancel</button>
-                            <button type="submit" class="btn btn-info float-right" onclick="window.location.href='../Home/Equipment';">Save</button>
+                            <div class="form-group">
+                                @Html.Label("Area2:", htmlAttributes: new { @class = "control-label col-md-2" })
+                                @*ViewBag.Area2List is holding all the Area2 values*@
+                                @Html.DropDownListFor(model => model.Areas2, (IEnumerable<SelectListItem>)  ViewBag.Areas2 , new { @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.Areas2, "", new { @class = "text-danger" })
+                            </div>
+
+
                         </div>
 
                     </div>
-                   
+                    <!-- /.row -->
+                    <div class="form-group row-cols-2">
+                        <input type="submit" value="Save" class="btn btn-default" />
+                        <input type="submit" value="Cancel" class="btn btn-default" />
+
+                    </div>
+
                 </div>
-            </div><!-- /.container-fluid -->
-        </section>
-            <!-- /.content -->
-</div>
+
+            </div>
+    </div><!-- /.container-fluid -->
+   
+    <!-- /.content -->
+    
     <!-- /.content-wrapper -->
     <!-- Control Sidebar -->
     <!-- jQuery -->
