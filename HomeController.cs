@@ -586,74 +586,68 @@ namespace InstrumentDatabase.Controllers
        [HttpGet]
         public ActionResult EquipForm()
         {
-            AreaModel cMainareamodel = new AreaModel();
-            SqlConnection con = new SqlConnection(ConnectionString);
-
-            List<SelectListItem> areas = new List<SelectListItem>();
-
-            SqlCommand cmd_AreaLst = new SqlCommand("select distinct area from EquipmentTag  where SNo is not null;", con);
-            SqlDataAdapter daArea_Lst = new SqlDataAdapter(cmd_AreaLst);
-            DataTable dtArea_Lst = new DataTable();
-            daArea_Lst.Fill(dtArea_Lst);
-
-            for (int i = 0; i < dtArea_Lst.Rows.Count; i++)
-            {
-                //cMainareamodel.Areas.Add(new SelectListItem { Text = dtArea_Lst.Rows[i]["area"].ToString(), Value = dtArea_Lst.Rows[i]["area"].ToString() });
-                areas.Add(new SelectListItem { Text = dtArea_Lst.Rows[i]["area"].ToString(), Value = dtArea_Lst.Rows[i]["area"].ToString() });
-            }
-            //ViewData["ListItems"] = Area_Lst;
-
-            ViewBag.areas = areas;
-
-
-            List<SelectListItem> Areas2 = new List<SelectListItem>();
-
-            SqlCommand cmd_Area2Lst = new SqlCommand("select distinct area2 from EquipmentTag  where SNo is not null;", con);
-            SqlDataAdapter daArea2_Lst = new SqlDataAdapter(cmd_Area2Lst);
-            DataTable dtArea2_Lst = new DataTable();
-            daArea2_Lst.Fill(dtArea2_Lst);
-
-            for (int i = 0; i < dtArea2_Lst.Rows.Count; i++)
-            {
-                //cMainareamodel.Areas.Add(new SelectListItem { Text = dtArea_Lst.Rows[i]["area"].ToString(), Value = dtArea_Lst.Rows[i]["area"].ToString() });
-                Areas2.Add(new SelectListItem { Text = dtArea2_Lst.Rows[i]["area2"].ToString(), Value = dtArea2_Lst.Rows[i]["area2"].ToString() });
-            }
-            //ViewData["ListItems"] = Area_Lst;
-
-            ViewBag.Areas2 = Areas2;
-
-            DropDownAreaList();
-
-            #region SequenceNo
-
-            string str_SequenceNo = "SELECT MAX(Tag) as Sequence FROM EquipmentTag where SNo is not null";
-            SqlCommand cmdSequenceNo = new SqlCommand(str_SequenceNo, con);
-            SqlDataAdapter daSequenceNo = new SqlDataAdapter(cmdSequenceNo);
-            DataTable dtSequenceNo = new DataTable();
-            daSequenceNo.Fill(dtSequenceNo);
-            int Seq_no = Convert.ToInt32(dtSequenceNo.Rows[0]["Sequence"].ToString());
-            Seq_no = Seq_no + 1;
-            cMainareamodel.Seq_No = Seq_no;
-            ViewBag.seq_no = Seq_no;
-
-            #endregion
+            GetDetailsEquipment();
 
             return View();
         }
 
         [HttpPost]
-        public ActionResult EquipForm(AreaModel obj)
+        public ActionResult EquipForm(AreaModel areamdl)
         {
             try
             {
+                GetDetailsEquipment();
+                areamdl.Areas = ViewBag.areas;
                 var errors = ModelState.Values.SelectMany(v => v.Errors);
-                if (ModelState.IsValid)
+                string Areas = string.Empty;
+                string Eq_Types = string.Empty;
+                string Seq_No = string.Empty;
+                string Eq_name = string.Empty;
+                string PIDNo = string.Empty;
+                string Areas2 = string.Empty;
+                string Requestor = string.Empty;
+                string Project_Name = string.Empty;
+                foreach (var key in ViewData.ModelState.Keys)
                 {
-                    //if (AddEquipmentTypeDetails(string Areas, string Eq_Types, Seq_No, Eq_name, PIDNo, Areas2, Requestor, Project_Name))
-                    //{
-                    //    ViewBag.Message = "Employee details added successfully";
-                    //}
+                    string modelStateVal = ViewData.ModelState[key].ToString();
+                    var currentKeyValue = ModelState[key].Value.AttemptedValue;
+                    switch (key)
+                    {
+                        case "Areas":
+                            Areas = currentKeyValue;
+                            break;
+                        case "Eq_Types":
+                            Eq_Types = currentKeyValue;
+                            break;
+                        case "Seq_No":
+                            Seq_No = currentKeyValue;
+                            break;
+                        case "Eq_name":
+                            Eq_name = currentKeyValue;
+                            break;
+                        case "PIDNo":
+                            PIDNo = currentKeyValue;
+                            break;
+                        case "Areas2":
+                            Areas2 = currentKeyValue;
+                            break;
+                        case "Requestor":
+                            Requestor = currentKeyValue;
+                            break;
+                        case "Project_Name":
+                            Project_Name = currentKeyValue;
+                            break;
+                        default:
+                            Console.WriteLine("Unknown value");
+                            break;
+                    }
+
                 }
+                if (AddEquipmentTypeDetails(Areas, Eq_Types, Seq_No, Eq_name, PIDNo, Areas2, Requestor, Project_Name))
+                {
+                    ViewBag.Message = "Equipment  details added successfully";
+                }
+
 
                 return View();
             }
