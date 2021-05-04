@@ -1,0 +1,24 @@
+MOM:
+1)Listbox with search option in instrument page
+2)
+3)
+4)
+5)
+6)
+
+
+Hi Hari,
+
+
+I Checked Maximum Tagno For Each Equipment Type and Each Area,
+Need to get Clarification For the below mentioned.
+
+1)We dont have Nomenclature for the area 51,95
+2)We dont have any Eq_type as 'U' -->Expendables (Catalyst, Refrigerant, Chemicals)
+3)There is no Nomenclature  for Eq_Type -->'M'
+4)We dont have Seq_No(Tag) for Most of the Eq_types means when we are trying to get Max(Seq_No) it was showing "Null"
+5)For Some of the EQ_Type -->MAX(Tag) is showing that Alpha Numeric Values(Ex:292C,7609J,8771-B).I Highlited these values in attached Excel.
+
+
+Regards,
+Krishnaveni boya
