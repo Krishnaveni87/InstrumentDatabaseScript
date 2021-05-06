@@ -1,8 +1,10 @@
 ﻿
-@{ ViewBag.Title = "Equipment"; }
-
+@{
+    ViewBag.Title = "Equipment";
+}
 @using System.Data
 @model DataTable
+
 
 <!DOCTYPE html>
 <html>
@@ -28,14 +30,15 @@
     <script src="~/Scripts/modernizr-2.8.3.js"></script>
     <link rel="stylesheet" href="../../Content/jquery.dataTables.min.css" />
     <link href="../../Content/fixedHeader.dataTables.min.css" rel="stylesheet" />
-
     <link rel="stylesheet" href="~/Views/Home/HomeStyle.css">
-
     <script src="../../Scripts/jquery-3.5.1.js"></script>
     <script src="../../Scripts/jquery.dataTables.min.js" defer></script>
     <script src="../../Scripts/dataTables.fixedHeader.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script type="text/javascript">
         $(document).ready(function () {
             // Setup - add a text input to each footer cell
@@ -57,137 +60,232 @@
             var table = $('#example').DataTable({
                 orderCellsTop: true,
                 fixedHeader: true,
-                scrollY: 300,
+                scrollY: 500,
                 scrollX: true,
                 paging: false,
                 autowidth: true,
                 pageLength: false,
                 bInfo: false
+
             });
         });
     </script>
     <style>
+
         table.display th {
-            font-size: 15px;
+            font-size: 16px;
         }
 
         table.display td {
-            font-size: 12px;
+            font-size: 16px;
         }
 
-        div#example_filter input {
+        .tableFixHead {
+            height: 600px;
+            div #example_filter input
+
+        {
             background-color: snow;
+        }
+
+        .dataTables_scrollBody {
+            height: 600px;
         }
     </style>
 </head>
-
-<body>
-    <div class="row">
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-            <div class="widget-tabs-int mg-t-30">
-                <div class="tab-hd">
-                    <img class="imgstyle" src="~/Images/pgsvg.svg" alt="" />
-                    <h2 style="font-weight:900">Equipment Number Generating System</h2>
-                    <div class="sidetab" style="float:right;margin-top:-4%">
-                        <button class="btn" onclick="window.location.href='Index'"><i class="fa fa-home"></i> Home</button>
-                        @*<button class="btn"><i class="fa fa-bars"></i> Menu</button>
-                            <button class="btn"><i class="fa fa-trash"></i> Trash</button>
-                            <button class="btn"><i class="fa fa-close"></i> Close</button>
-                            <button class="btn"><i class="fa fa-folder"></i> Folder</button>*@
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <body>
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="widget-tabs-int mg-t-30">
+                    <div class="tab-hd">
+                        <img class="imgstyle" src="~/Images/pgsvg.svg" alt="" />
+                        <h2 style="font-weight:900">Equipment Number Generating System</h2>
+                        <div class="sidetab" style="float:right;margin-top:-4%">
+                            <button class="btn" onclick="window.location.href='Index'"><i class="fa fa-home"></i> Home</button>
+                            @*<button class="btn"><i class="fa fa-bars"></i> Menu</button>
+                                <button class="btn"><i class="fa fa-trash"></i> Trash</button>
+                                <button class="btn"><i class="fa fa-close"></i> Close</button>
+                                <button class="btn"><i class="fa fa-folder"></i> Folder</button>*@
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="widget-tabs-list tab-pt-mg">
-                            <ul class="nav nav-tabs tab-nav-center ul_font">
-                                @*<li class="active"><a data-toggle="tab" href="Index">Back To Home</a></li>*@
-                                @*<li><a data-toggle="tab" href="#menu13">Instruments</a></li>
-                                    <li><a data-toggle="tab" href="#menu23">Vendors</a></li>
-                                    <li><a data-toggle="tab" href="#home4">Manufacturers</a></li>
-                                    <li><a data-toggle="tab" href="#menu14">Instrument Types</a></li>
-                                    <li><a data-toggle="tab" href="#menu24">Information Types</a></li>
-                                    <li><a data-toggle="tab" href="#menu24">Information Groups</a></li>
-                                    <li><a data-toggle="tab" href="#menu24">Loops</a></li>*@
-                            </ul>
-                            <div class="tab-content tab-custom-st">
-                                <div id="home3" class="tab-pane in active animated zoomInLeft">
-                                    <div class="tab-ctn p-t-5">
-                                        <div class="sidetab" style="float:right;">
-                                            <button class="btn" @*onclick="window.location.href='Index'"*@ style="background-color:#0037B1;color:snow"><i class="fa fa-arrows-v"></i> Import/Export</button>
-                                            <br />
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="widget-tabs-list tab-pt-mg">
+                                <ul class="nav nav-tabs tab-nav-center ul_font">
+                                    @*<li class="active"><a data-toggle="tab" href="Index">Back To Home</a></li>*@
+                                    @*<li><a data-toggle="tab" href="#menu13">Instruments</a></li>
+                                        <li><a data-toggle="tab" href="#menu23">Vendors</a></li>
+                                        <li><a data-toggle="tab" href="#home4">Manufacturers</a></li>
+                                        <li><a data-toggle="tab" href="#menu14">Instrument Types</a></li>
+                                        <li><a data-toggle="tab" href="#menu24">Information Types</a></li>
+                                        <li><a data-toggle="tab" href="#menu24">Information Groups</a></li>
+                                        <li><a data-toggle="tab" href="#menu24">Loops</a></li>*@
+                                </ul>
+                                <div class="tab-content tab-custom-st">
+                                    <div id="home3" class="tab-pane in active animated zoomInLeft">
+                                        <div class="tab-ctn p-t-5">
+                                            <div id="dummy">
+                                                <p>
+                                                    <a class="btn btn-primary" data-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                                                        Link with href
+                                                    </a>
+                                                    <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample1" aria-expanded="false" aria-controls="collapseExample1">
+                                                        Button with data-target
+                                                    </button>
+                                                </p>
+                                                <div class="collapse" id="collapseExample" data-parent="#dummy">
 
-                                        </div>
-                                        <div class="text-right">
-                                            <button type="button" class="btn btn-primary" onclick="window.location.href='../Home/EquipForm'">Genereate New EQ Tag</button>
-                                        </div>
-                                        <br>
-                                        <div>
-                                            <table id="example" class="display" style="width:100%">
+                                                    <div class="card-body" style="background-color: #4088ac">
+                                                        <div class="row">
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    @Html.Label("Area:")
+                                                                    @*ViewBag.AreaList is holding all the Area values*@
+                                                                    @Html.DropDownListFor(model => model.Areas, (IEnumerable<SelectListItem>)ViewBag.areas, new { @class = "form-control", @onchange = "DropDownAreaList()" })
+                                                                    @*@Html.ValidationMessageFor(model => model.Areas, "", new { @class = "text-danger" })*@
+                                                                </div>
 
-                                                <thead>
-                                                    <tr>
-                                                        @foreach (DataColumn col in Model.Columns)
+                                                                <div class="form-group">
+                                                                    @Html.Label("Equipment Name:")
+                                                                    @Html.EditorFor(model => model.Eq_name, new { htmlAttributes = new { @class = "form-control" } })
+                                                                    @Html.ValidationMessageFor(model => model.Eq_name, "", new { @class = "text-danger" })
+                                                                </div>
+
+                                                                <div class="form-group">
+                                                                    @Html.Label("Requestor:")
+                                                                    @Html.EditorFor(model => model.Requestor, new { htmlAttributes = new { @class = "form-control" } })
+                                                                    @Html.ValidationMessageFor(model => model.Requestor, "", new { @class = "text-danger" })
+                                                                </div>
+                                                                <!-- /.form-group -->
+                                                            </div>
+                                                            <!-- /.col -->
+                                                            <div class="col-md-4">
+
+                                                                <div class="form-group">
+                                                                    @Html.Label("Equipment Type:")
+                                                                    @*ViewBag.Eq_Types is holding all the Equipment values*@
+                                                                    @Html.DropDownListFor(model => model.Eq_Types, (IEnumerable<SelectListItem>)ViewBag.Eq_Types, new { @class = "form-control" })
+                                                                    @*@Html.ValidationMessageFor(model => model.Eq_Types, "", new { @class = "text-danger" })*@
+                                                                </div>
+                                                                <!-- /.form-group -->
+                                                                <div class="form-group">
+                                                                    @Html.Label("P&ID No:")
+                                                                    @Html.EditorFor(model => model.PIDNo, new { htmlAttributes = new { @class = "form-control" } })
+                                                                    @Html.ValidationMessageFor(model => model.PIDNo, "", new { @class = "text-danger" })
+                                                                </div>
+                                                                <!-- /.form-group -->
+                                                                <div class="form-group">
+                                                                    @Html.Label("Project Name:")
+                                                                    @Html.EditorFor(model => model.Project_Name, new { htmlAttributes = new { @class = "form-control" } })
+                                                                    @Html.ValidationMessageFor(model => model.Project_Name, "", new { @class = "text-danger" })
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- /.col -->
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    @Html.Label("Sequence No:")
+                                                                    @Html.EditorFor(model => model.Seq_No, new { htmlAttributes = new { @class = "form-control", @Value = ViewBag.seq_no } })
+                                                                    @Html.ValidationMessageFor(model => model.Seq_No, "", new { @class = "text-danger" })
+                                                                </div>
+
+                                                                <div class="form-group">
+                                                                    @Html.Label("Area2:")
+                                                                    @*ViewBag.Area2List is holding all the Area2 values*@
+                                                                    @Html.DropDownListFor(model => model.Areas2, (IEnumerable<SelectListItem>)ViewBag.Areas2, new { @class = "form-control" })
+                                                                    @*@Html.ValidationMessageFor(model => model.Areas2, "", new { @class = "text-danger" })*@
+                                                                </div>
+
+
+                                                            </div>
+
+                                                        </div>
+                                                        <!-- /.row -->
+                                                        <div class="form-group row-cols-2">
+                                                            <button type="reset" class="btn btn-default float-right" style="margin-left:30px;" onclick="window.location.href='../Home/Equipment';">Cancel</button>
+                                                            <button type="submit" class="btn btn-info float-right">Save</button>
+
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <div class="col-md-offset-2 col-md-10" style="color:green">
+                                                                @ViewBag.Message
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+                                            <div>
+                                                <table id="example" class="display tableFixHead" style="width:100%">
+
+                                                    <thead>
+                                                        <tr>
+                                                            @foreach (DataColumn col in Model.Columns)
+                                                            {
+                                                                <th>
+                                                                    @col.ColumnName
+                                                                </th>
+                                                            }
+                                                        </tr>
+
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach (DataRow row in Model.Rows)
                                                         {
-                                            <th>
-                                                @col.ColumnName
-                                            </th>
-}
-                                                    </tr>
-
-                                                </thead>
-                                                <tbody>
-                                                    @foreach (DataRow row in Model.Rows)
-                                                    {
-                                        <tr>
-                                            @foreach (DataColumn col in Model.Columns)
-                                            {
-                            <td>
-                                @row[col.ColumnName]
-                            </td>}
-                                        </tr>}
-                                                </tbody>
-                                            </table>
+                                                            <tr>
+                                                                @foreach (DataColumn col in Model.Columns)
+                                                                {
+                                                                    <td>
+                                                                        @row[col.ColumnName]
+                                                                    </td>
+                                                                }
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
                                     </div>
+                                    @*<div id="menu13" class="tab-pane animated zoomInLeft">
+                                            <div class="tab-ctn">
+                                                <p>this is menu2 content</p>
+                                                <p class="tab-mg-b-0">this is menu2 content</p>
+                                            </div>
+                                        </div>
+                                        <div id="menu23" class="tab-pane animated zoomInLeft">
+                                            <div class="tab-ctn">
+                                                <p>this is menu3 content</p>
+                                                <p class="tab-mg-b-0">this is maincontent in menu3.</p>
+                                            </div>
+                                        </div>
+                                        <div id="home4" class="tab-pane in active animated zoomInLeft">
+                                            <div class="tab-ctn">
+                                                <p>this is content in menu4</p>
+                                                <p class="tab-mg-b-0">this is maincontent in menu4.</p>
+                                            </div>
+                                        </div>
+                                        <div id="menu14" class="tab-pane animated zoomInLeft">
+                                            <div class="tab-ctn">
+                                                <p>this is menu5 content</p>
+                                                <p class="tab-mg-b-0">this is maincontent in menu5</p>
+                                            </div>
+                                        </div>
+                                        <div id="menu24" class="tab-pane animated zoomInLeft">
+                                            <div class="tab-ctn">
+                                                <p>this is menu6 content</p>
+                                                <p class="tab-mg-b-0">this is maincontent in menu6.</p>
+                                            </div>*@
                                 </div>
-                                @*<div id="menu13" class="tab-pane animated zoomInLeft">
-                                        <div class="tab-ctn">
-                                            <p>this is menu2 content</p>
-                                            <p class="tab-mg-b-0">this is menu2 content</p>
-                                        </div>
-                                    </div>
-                                    <div id="menu23" class="tab-pane animated zoomInLeft">
-                                        <div class="tab-ctn">
-                                            <p>this is menu3 content</p>
-                                            <p class="tab-mg-b-0">this is maincontent in menu3.</p>
-                                        </div>
-                                    </div>
-                                    <div id="home4" class="tab-pane in active animated zoomInLeft">
-                                        <div class="tab-ctn">
-                                            <p>this is content in menu4</p>
-                                            <p class="tab-mg-b-0">this is maincontent in menu4.</p>
-                                        </div>
-                                    </div>
-                                    <div id="menu14" class="tab-pane animated zoomInLeft">
-                                        <div class="tab-ctn">
-                                            <p>this is menu5 content</p>
-                                            <p class="tab-mg-b-0">this is maincontent in menu5</p>
-                                        </div>
-                                    </div>
-                                    <div id="menu24" class="tab-pane animated zoomInLeft">
-                                        <div class="tab-ctn">
-                                            <p>this is menu6 content</p>
-                                            <p class="tab-mg-b-0">this is maincontent in menu6.</p>
-                                        </div>*@
                             </div>
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
-    </div>
-
-</body>
+    </body>
+}
 </html>
-
