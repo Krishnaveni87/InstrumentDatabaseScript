@@ -73,15 +73,7 @@
 
         function GetEq_Types() {
 
-            //var targetinfo = [];
-            //var status = 0;
-            debugger;
             var Selected_Area = $('#ddlArea').val().trim();
-            //var seqNo = $('#txtSeqNo').val().trim();
-            //var instName = $('#txtInstName').val().trim();
-            //var pnIdNo = $('#txtPnIdNo').val().trim();
-            //var requestor = $('#txtRequestor').val().trim();
-            //var project = $('#txtProject').val().trim();
 
             if (Selected_Area != null ) {
                     $.ajax({
@@ -94,7 +86,7 @@
                     success: function (data) {
                         var markup = "<option value='0'>--Select--</option>";
                         for (var x = 0; x < data.length; x++) {
-                            markup += "<option value=" + data[x].Value + ">" + data[x].Text + "</option>";
+                            markup += "<option value=" + data[x].Text + ">" + data[x].Text + "</option>";
                         }
                         $("#ddlEqType").html(markup).show();
 
@@ -116,19 +108,11 @@
             //alert('Saved Successfully!!');
         }
 
+        function GetMaxSeq_no() {
 
-         function GetMaxSeq_no() {
-
-            //var targetinfo = [];
-            //var status = 0;
-             debugger;
             var Selected_Area = $('#ddlArea').val().trim();
             var Selected_EqType = $('#ddlEqType').val().trim();
-            //var instName = $('#txtInstName').val().trim();
-            //var pnIdNo = $('#txtPnIdNo').val().trim();
-            //var requestor = $('#txtRequestor').val().trim();
-            //var project = $('#txtProject').val().trim();
-             alert(Selected_EqType);
+             //alert(Selected_EqType);
              if (Selected_Area != null && Selected_EqType != null ) {
                     $.ajax({
                     url: '@Url.Action("GetMaxSeq_NO", "EquipmentTag")',
@@ -139,8 +123,8 @@
                     contentType: "application/json; charset=utf-8",
                     success: function (data) {
                         var markup = data;
-                        
-                        $("#txtSequenceNo").html(markup).show();
+
+                        $("#txtSequenceNo").val(data[0].Text);
 
                     },
                     error: function (xhr) {
@@ -159,6 +143,170 @@
 
             //alert('Saved Successfully!!');
         }
+
+        function GetSeqNo_Count() {
+
+            var Seq_no = $('#txtSequenceNo').val().trim();
+            //var Selected_EqType = $('#ddlEqType').val().trim();
+             //alert(Selected_EqType);
+            if (Seq_no != null  ) {
+                    $.ajax({
+                    url: '@Url.Action("GetSeqNo_Count", "EquipmentTag")',
+                    dataType: "json",
+                    type: "POST",
+                    cache: false,
+                        data: JSON.stringify({ 'Seqno': Seq_no}),
+                    contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                        var markup = data;
+                        if (markup > 0) {
+                            alert("Entered Sequence Number already Used!Please Enter another Sequence Number")
+                        }
+
+                        //$("#txtSequenceNo").val(data[0].Text);
+
+                    },
+                    error: function (xhr) {
+                        $("#failure-alertmap").text('Error');
+                        $("#failure-alertmap").show();
+                        $("#failure-alertmap").delay(3000).addClass("in").fadeOut(1000);
+                    }
+                });
+
+            } else {
+                $("#failure-alertmap").text('Please enter value for all fields');
+                $("#failure-alertmap").show();
+                $("#failure-alertmap").delay(3000).addClass("in").fadeOut(1000);
+                return false;
+            }
+
+            //alert('Saved Successfully!!');
+        }
+
+        function EqDetailsSave()
+         {
+
+            var Selected_Area = $('#ddlArea').val().trim();
+            var Selected_EqType = $("#ddlEqType option:selected").text();
+            //var Selected_EqType = $('#ddlEqType').val().trim();
+			var Seq_no=$('#txtSequenceNo').val().trim();
+            var Equipment_Name = $('#txtEQName').val().trim();
+            var PIDNo = $('#txtPIDNo').val().trim();
+			var Area2=$('#ddlArea2').val().trim();
+            var Requestor = $('#txtRequestor').val().trim();
+            var Project_Name = $('#txtProjectName').val().trim();
+
+            if (Selected_Area != null && Selected_EqType != null && Seq_no!=null && Equipment_Name!=null && PIDNo!=null && Area2!=null &&  Requestor!=null && Project_Name!=null )
+			{
+                    $.ajax({
+                    url: '@Url.Action("AddEquipmentTypeDetails", "EquipmentTag")',
+                    dataType: "json",
+                    type: "POST",
+                    cache: false,
+                        data: JSON.stringify({ 'Area': Selected_Area, 'Eq_Type': Selected_EqType, 'Seq_No': Seq_no, 'Eq_name': Equipment_Name,'PIDNo':PIDNo ,'Areas2':Area2, 'Requestor': Requestor, 'Project_Name': Project_Name}),
+                    contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                        var res = data;
+                        if (res == "Success") {
+                        alert('Equipment Details Saved Successfully..');
+                            //window.location.href = '../Home/Equipment;
+                        }
+                    },
+                    error: function (xhr) {
+                        $("#failure-alertmap").text('Error');
+                        $("#failure-alertmap").show();
+                        $("#failure-alertmap").delay(3000).addClass("in").fadeOut(1000);
+                    }
+                });
+
+            }
+            else
+            {
+			alert('Please Enter all the Fields');
+                $("#failure-alertmap").text('Please enter value for all fields');
+                $("#failure-alertmap").show();
+                $("#failure-alertmap").delay(3000).addClass("in").fadeOut(1000);
+                return false;
+            }
+
+            //alert('Saved Successfully!!');
+            window.location.href = '../EquipmentTag/EquipmentTag';
+        }
+
+         function GetFLOCCode()
+          {
+
+            var Tag_No = $('#txtTagNumber').val().trim();
+
+            if (Tag_No != null )
+			{
+                    $.ajax({
+                    url: '@Url.Action("GetFLOCCode", "EquipmentTag")',
+                    dataType: "json",
+                    type: "POST",
+                    cache: false,
+                        data: JSON.stringify({ 'TagNo': Tag_No}),
+                    contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                        $("#txtFLOCCode").val(data[0].Text);
+
+                    },
+                    error: function (xhr) {
+                        $("#failure-alertmap").text('Error');
+                        $("#failure-alertmap").show();
+                        $("#failure-alertmap").delay(3000).addClass("in").fadeOut(1000);
+                    }
+                });
+
+            } else {
+			alert('Please Enter all the Fields');
+                $("#failure-alertmap").text('Please enter value for all fields');
+                $("#failure-alertmap").show();
+                $("#failure-alertmap").delay(3000).addClass("in").fadeOut(1000);
+                return false;
+            }
+
+
+        }
+
+
+        function SaveFLOCcode()
+          {
+
+            var Tag_No = $('#txtTagNumber').val().trim();
+            var FLOC_Code = $('#txtFLOCCode').val().trim();
+            if (Tag_No != null )
+			{
+                    $.ajax({
+                    url: '@Url.Action("SaveFLOCcode", "EquipmentTag")',
+                    dataType: "json",
+                    type: "POST",
+                    cache: false,
+                        data: JSON.stringify({ 'TagNo': Tag_No, 'FLOCCode': FLOC_Code}),
+                    contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                        //$("#txtFLOCCode").val(data[0].Text);
+
+                    },
+                    error: function (xhr) {
+                        $("#failure-alertmap").text('Error');
+                        $("#failure-alertmap").show();
+                        $("#failure-alertmap").delay(3000).addClass("in").fadeOut(1000);
+                    }
+                });
+
+            } else {
+			alert('Please Enter all the Fields');
+                $("#failure-alertmap").text('Please enter value for all fields');
+                $("#failure-alertmap").show();
+                $("#failure-alertmap").delay(3000).addClass("in").fadeOut(1000);
+                return false;
+            }
+
+            alert('Saved Successfully..');
+            window.location.href = 'https://localhost:44308/EquipmentTag/EquipmentTag';
+        }
+
     </script>
     <style>
         table.display th {
@@ -240,14 +388,14 @@
 
                                                                 <div class="form-group">
                                                                     @Html.Label("Equipment Name:")
-                                                                    @Html.Editor("ddlEQName", new { htmlAttributes = new { @class = "form-control" } })
-                                                                    @Html.ValidationMessage("ddlEQName", "", new { @class = "text-danger" })
+                                                                    @Html.Editor("txtEQName", new { htmlAttributes = new { @class = "form-control" } })
+                                                                    @Html.ValidationMessage("txtEQName", "*", new { @class = "text-danger" })
                                                                 </div>
 
                                                                 <div class="form-group">
                                                                     @Html.Label("Requestor:")
-                                                                    @Html.Editor("lblRequestor", new { htmlAttributes = new { @class = "form-control" } })
-                                                                    @Html.ValidationMessage("lblRequestor", "", new { @class = "text-danger" })
+                                                                    @Html.Editor("txtRequestor", new { htmlAttributes = new { @class = "form-control" } })
+                                                                    @Html.ValidationMessage("txtRequestor", "*", new { @class = "text-danger" })
                                                                 </div>
                                                                 <!-- /.form-group -->
                                                             </div>
@@ -263,14 +411,14 @@
                                                                 <!-- /.form-group -->
                                                                 <div class="form-group">
                                                                     @Html.Label("P&ID No:")
-                                                                    @Html.Editor("lblPIDNo", new { htmlAttributes = new { @class = "form-control" } })
-                                                                    @Html.ValidationMessage("lblPIDNo", "", new { @class = "text-danger" })
+                                                                    @Html.Editor("txtPIDNo", new { htmlAttributes = new { @class = "form-control" } })
+                                                                    @Html.ValidationMessage("txtPIDNo", "*", new { @class = "text-danger" })
                                                                 </div>
                                                                 <!-- /.form-group -->
                                                                 <div class="form-group">
                                                                     @Html.Label("Project Name:")
-                                                                    @Html.Editor("lblProjectName", new { htmlAttributes = new { @class = "form-control" } })
-                                                                    @Html.ValidationMessage("lblProjectName", "", new { @class = "text-danger" })
+                                                                    @Html.Editor("txtProjectName", new { htmlAttributes = new { @class = "form-control" } })
+                                                                    @Html.ValidationMessage("txtProjectName", "*", new { @class = "text-danger" })
                                                                 </div>
                                                             </div>
 
@@ -278,8 +426,8 @@
                                                             <div class="col-md-4">
                                                                 <div class="form-group">
                                                                     @Html.Label("Sequence No:")
-                                                                    @Html.Editor("txtSequenceNo", new { htmlAttributes = new { @class = "form-control" } })
-                                                                    @Html.ValidationMessage("lblSequenceNo", "", new { @class = "text-danger" })
+                                                                    @Html.Editor("txtSequenceNo", new { htmlAttributes = new { @class = "form-control", @onchange = "GetSeqNo_Count()" } })
+                                                                    @Html.ValidationMessage("txtSequenceNo", "*", new { @class = "text-danger" })
                                                                 </div>
 
                                                                 <div class="form-group">
@@ -295,8 +443,8 @@
                                                         </div>
                                                         <!-- /.row -->
                                                         <div class="form-group row-cols-2">
-                                                            <button type="submit" class="btn btn-info float-right" style="margin-left:30px;">Save</button>
-                                                            <button type="reset" class="btn btn-default float-right" style="margin-left:30px;" onclick="window.location.href='../Home/Equipment';">Cancel</button>
+                                                            <button type="submit" class="btn btn-info float-right" style="margin-left:30px;" onclick="EqDetailsSave()">Save</button>
+                                                            <button type="reset" class="btn btn-default float-right" style="margin-left:30px;" onclick="window.location.href='../Home/EquipmentTag';">Cancel</button>
 
 
                                                         </div>
@@ -316,10 +464,10 @@
                                                         <div class="row">
                                                             <div class="col-md-4">
                                                                 <div class="form-group">
-                                                                    @Html.Label("FLOC Code:")
-                                                                    @Html.Editor("txtFLOCCode", new { htmlAttributes = new { @class = "form-control" } })
+                                                                    @Html.Label("TagNumber")
+                                                                    @Html.Editor("txtTagNumber", new { htmlAttributes = new { @class = "form-control",@onchange="GetFLOCCode()" } })
                                                                    
-                                                                    @*@Html.ValidationMessageFor(model => model.Areas, "", new { @class = "text-danger" })*@
+                                                                    @Html.ValidationMessage("txtTagNumber", "*", new { @class = "text-danger" })
                                                                 </div>
 
                                                                 <!--<div class="form-group">
@@ -339,9 +487,9 @@
                                                             <div class="col-md-4">
 
                                                                 <div class="form-group">
-                                                                    @Html.Label("TagNumber:")
-                                                                    @Html.Editor("txtTagNumber", new { htmlAttributes = new { @class = "form-control" } })
-                                                                    @*@Html.ValidationMessageFor(model => model.Eq_Types, "", new { @class = "text-danger" })*@
+                                                                    @Html.Label("FLOC Code:")
+                                                                    @Html.Editor("txtFLOCCode", new { htmlAttributes = new { @class = "form-control" } })
+                                                                    @Html.ValidationMessage("txtFLOCCode", "*", new { @class = "text-danger" })
                                                                 </div>
                                                                 <!-- /.form-group -->
                                                                 <!--<div class="form-group">
@@ -358,12 +506,12 @@
                                                             </div>
 
                                                             <!-- /.col -->
-                                                            <div class="col-md-4">
+                                                            <!--<div class="col-md-4">
                                                                 <div class="form-group">
                                                                     @Html.Label("Sequence No:")
-                                                                    @Html.Editor("txtSequenceNo", new { htmlAttributes = new { @class = "form-control" } })
+                                                                    @Html.Editor("txtSequenceNo", new { htmlAttributes = new { @class = "form-control" } })-->
                                                                     @*@Html.ValidationMessageFor(model => model.Seq_No, "", new { @class = "text-danger" })*@
-                                                                </div>
+                                                                <!--</div>-->
 
                                                                 <!--<div class="form-group">
                                                                     @Html.Label("Area2:")-->
@@ -386,7 +534,7 @@
                                                             </div>
                                                             <!-- /.row -->
                                                             <div class="form-group row-cols-2">
-                                                                <button type="submit" class="btn btn-info float-right" style="margin-left:30px;">Save</button>
+                                                                <button type="submit" class="btn btn-info float-right" style="margin-left:30px;" onclick="SaveFLOCcode()">Save</button>
                                                                 <button type="reset" class="btn btn-default float-right" style="margin-left:30px;" onclick="window.location.href='../Home/Equipment';">Cancel</button>
                                                             </div>
                                                             <div class="form-group">
@@ -434,42 +582,14 @@
                                             </div>
                                         </div>
                                     </div>
-                                    @*<div id="menu13" class="tab-pane animated zoomInLeft">
-                                            <div class="tab-ctn">
-                                                <p>this is menu2 content</p>
-                                                <p class="tab-mg-b-0">this is menu2 content</p>
-                                            </div>
-                                        </div>
-                                        <div id="menu23" class="tab-pane animated zoomInLeft">
-                                            <div class="tab-ctn">
-                                                <p>this is menu3 content</p>
-                                                <p class="tab-mg-b-0">this is maincontent in menu3.</p>
-                                            </div>
-                                        </div>
-                                        <div id="home4" class="tab-pane in active animated zoomInLeft">
-                                            <div class="tab-ctn">
-                                                <p>this is content in menu4</p>
-                                                <p class="tab-mg-b-0">this is maincontent in menu4.</p>
-                                            </div>
-                                        </div>
-                                        <div id="menu14" class="tab-pane animated zoomInLeft">
-                                            <div class="tab-ctn">
-                                                <p>this is menu5 content</p>
-                                                <p class="tab-mg-b-0">this is maincontent in menu5</p>
-                                            </div>
-                                        </div>
-                                        <div id="menu24" class="tab-pane animated zoomInLeft">
-                                            <div class="tab-ctn">
-                                                <p>this is menu6 content</p>
-                                                <p class="tab-mg-b-0">this is maincontent in menu6.</p>
-                                            </div>*@
+                                    
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+       
     </body>
 }
 </html>

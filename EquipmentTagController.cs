@@ -5,6 +5,7 @@ using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
 
@@ -33,7 +34,7 @@ namespace DataTableExample.Controllers
 
             SqlConnection con = new SqlConnection(ConnectionString);
 
-            string EquipmentData_Str = "select SNo,Area,Eq_Type,Tag,P_ID,Eq,FLC_as_in_EqList,FLC_in_FLOC,FLOC_Status,Area2,Remarks from EquipmentTag;";
+            string EquipmentData_Str = "select SNo,Area,Eq_Type,Tag,P_ID,Eq,FLC_as_in_EqList,FLC_in_FLOC,FLOC_Status,Area2,Remarks,created_on,Created_by,updated_on,updated_by from EquipmentTag order by created_on desc;";
             SqlCommand cmdEquipmentData = new SqlCommand(EquipmentData_Str, con);
             SqlDataAdapter daEquipmentData = new SqlDataAdapter(cmdEquipmentData);
             daEquipmentData.Fill(DT_EquipmentData);
@@ -167,14 +168,24 @@ namespace DataTableExample.Controllers
         public ActionResult GetMaxSeq_NO(string SelectedArea, string SelectedEqType)
         {
             SqlConnection con = new SqlConnection(ConnectionString);
-            string eq_type = SelectedEqType.Substring(0, 2);
+            string eq_type = SelectedEqType;
             int area = Convert.ToInt32(SelectedArea.Substring(0, 2));
             string str_SequenceNo = "select max(Tag) as Sequence from EquipmentTag where area=" + area + "  and eq_type='" + eq_type + "'";
             SqlCommand cmdSequenceNo = new SqlCommand(str_SequenceNo, con);
             SqlDataAdapter daSequenceNo = new SqlDataAdapter(cmdSequenceNo);
             DataTable dtSequenceNo = new DataTable();
             daSequenceNo.Fill(dtSequenceNo);
-            int Seq_no = Convert.ToInt32(dtSequenceNo.Rows[0]["Sequence"].ToString());
+            int Seq_no = 0;
+            int errorCounter = Regex.Matches(dtSequenceNo.Rows[0]["Sequence"].ToString(), @"[a-zA-Z]").Count;
+            if (errorCounter > 0)
+            {
+                string value = Regex.Replace(dtSequenceNo.Rows[0]["Sequence"].ToString(), "[A-Za-z ]", "");
+                Seq_no = Convert.ToInt32(value);
+            }
+            else
+            {
+                Seq_no = Convert.ToInt32(dtSequenceNo.Rows[0]["Sequence"].ToString());
+            }
             Seq_no = Seq_no + 1;
             List<string> MaxSeq_no = new List<string>();
 
@@ -183,6 +194,119 @@ namespace DataTableExample.Controllers
             var MaxSeq_noEq = new SelectList(MaxSeq_no);
             ViewData["MaxSeq_noEq"] = MaxSeq_noEq;
             return Json(MaxSeq_noEq, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult GetSeqNo_Count(string Seqno)
+        {
+            SqlConnection con = new SqlConnection(ConnectionString);
+            string str_CountSeqno = "select count(*) as Rows_Count from EquipmentTag   where  Tag=@Tag;";
+            SqlCommand cmd_CountSeqno = new SqlCommand(str_CountSeqno, con);
+            cmd_CountSeqno.Parameters.AddWithValue("@Tag", Seqno);
+            SqlDataAdapter da_CountSeqno = new SqlDataAdapter(cmd_CountSeqno);
+            DataTable dt_CountSeqno = new DataTable();
+            da_CountSeqno.Fill(dt_CountSeqno);
+            var Seq_noCount = dt_CountSeqno.Rows[0]["Rows_Count"].ToString();
+            return Json(Seq_noCount, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult GetFLOCCode(string TagNo)
+        {
+            SqlConnection con = new SqlConnection(ConnectionString);
+            string str_FLCin_FLOC = "select FLC_in_FLOC from EquipmentTag where Tag=@TagNo";
+            SqlCommand cmd_FLCin_FLOC = new SqlCommand(str_FLCin_FLOC, con);
+            cmd_FLCin_FLOC.Parameters.AddWithValue("@TagNo", TagNo);
+            SqlDataAdapter da_FLCin_FLOC = new SqlDataAdapter(cmd_FLCin_FLOC);
+            DataTable dt_FLCin_FLOC = new DataTable();
+            da_FLCin_FLOC.Fill(dt_FLCin_FLOC);
+            var FLOC_CODE="0";
+            if (dt_FLCin_FLOC.Rows.Count!=0)
+            {
+                FLOC_CODE = dt_FLCin_FLOC.Rows[0]["FLC_in_FLOC"].ToString();
+                return Json(FLOC_CODE, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(FLOC_CODE, JsonRequestBehavior.AllowGet);
+            }
+            
+            
+        }
+
+        public ActionResult SaveFLOCcode(string TagNo,string FLOCCode)
+        {
+            string ConnectionString = ConfigurationManager.ConnectionStrings["cons"].ConnectionString;
+            SqlConnection con = new SqlConnection(ConnectionString);
+            string str_UpdateFLOC = "update EquipmentTag set FLOC_Status=@FLOC_Status,FLC_in_FLOC=@FLC_in_FLOC,updated_on=@updated_on,updated_by=@updated_by where Tag=@Tag;";
+            SqlCommand cmd_UpdateFLOC = new SqlCommand(str_UpdateFLOC, con);
+            cmd_UpdateFLOC.Parameters.AddWithValue("@FLOC_Status", 1);
+            cmd_UpdateFLOC.Parameters.AddWithValue("@FLC_in_FLOC", FLOCCode);
+            cmd_UpdateFLOC.Parameters.AddWithValue("@Tag", TagNo);
+            cmd_UpdateFLOC.Parameters.AddWithValue("@updated_on", DateTime.Now);
+            cmd_UpdateFLOC.Parameters.AddWithValue("@updated_by", "Admin");
+            con.Open();
+            int i = cmd_UpdateFLOC.ExecuteNonQuery();
+            if (i > 0)
+            {
+                return Json("Success", JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json("Failure", JsonRequestBehavior.AllowGet);
+            }
+            
+        }
+
+        public ActionResult AddEquipmentTypeDetails(string Area, string Eq_Type, string Seq_No, string Eq_name, string PIDNo, string Areas2, string Requestor, string Project_Name)
+        {
+            try
+            {
+                string ConnectionString = ConfigurationManager.ConnectionStrings["cons"].ConnectionString;
+                SqlConnection con = new SqlConnection(ConnectionString);
+
+                //15-C-5564
+                string Area_Param = Area.Substring(0, 2);
+                string Area_DescParam = Area.Substring(2, Area.Length - 2);
+                string EqType_Param = Eq_Type.Substring(0, 1);
+                string EqTypeDesc_Param = Eq_Type.Substring(1, Eq_Type.Length - 1).Trim();
+
+                string EQ = Area_Param + "-" + EqType_Param + "-" + Seq_No;
+                SqlCommand cmd_InsertEqDetails = new SqlCommand("InsertEquipmentType", con);
+                cmd_InsertEqDetails.CommandType = CommandType.StoredProcedure;
+                cmd_InsertEqDetails.Parameters.AddWithValue("@Area", Area_Param);
+                cmd_InsertEqDetails.Parameters.AddWithValue("@Area_Description", Area_DescParam);
+                cmd_InsertEqDetails.Parameters.AddWithValue("@Eq_Type", EqType_Param);
+                cmd_InsertEqDetails.Parameters.AddWithValue("@Eq_TypeDescription", EqTypeDesc_Param);
+                cmd_InsertEqDetails.Parameters.AddWithValue("@Tag", Seq_No);
+                cmd_InsertEqDetails.Parameters.AddWithValue("@Equipment_Name", Eq_name);
+                cmd_InsertEqDetails.Parameters.AddWithValue("@P_ID", PIDNo);
+                cmd_InsertEqDetails.Parameters.AddWithValue("@Eq", EQ);
+                cmd_InsertEqDetails.Parameters.AddWithValue("@FLOC_Status", 0);
+                cmd_InsertEqDetails.Parameters.AddWithValue("@Area2", Areas2);
+                cmd_InsertEqDetails.Parameters.AddWithValue("@Requestor", Requestor);
+                cmd_InsertEqDetails.Parameters.AddWithValue("@Project_Name", Project_Name);
+                cmd_InsertEqDetails.Parameters.AddWithValue("@Created_on", DateTime.Now);
+                cmd_InsertEqDetails.Parameters.AddWithValue("@Created_by", "Admin");
+                cmd_InsertEqDetails.Parameters.AddWithValue("@Updated_on", DateTime.Now);
+                cmd_InsertEqDetails.Parameters.AddWithValue("@Updated_by", "Admin");
+
+                con.Open();
+                int i = cmd_InsertEqDetails.ExecuteNonQuery();
+                con.Close();
+                if (i >= 1)
+                {
+                    return Json("Success", JsonRequestBehavior.AllowGet);
+                }
+                else
+                {
+                    return Json("Failure", JsonRequestBehavior.AllowGet);
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
         }
     }
 }
