@@ -34,7 +34,7 @@ namespace DataTableExample.Controllers
 
             SqlConnection con = new SqlConnection(ConnectionString);
 
-            string EquipmentData_Str = "select SNo,Area,Eq_Type,Tag,P_ID,Eq,FLC_as_in_EqList,FLC_in_FLOC,FLOC_Status,Area2,Remarks,created_on,Created_by,updated_on,updated_by from EquipmentTag order by created_on desc;";
+            string EquipmentData_Str = "select SNo,Area,Eq_Type,Tag,P_ID,Eq,FLC_in_FLOC,Area2,Remarks,created_on,Created_by,updated_on,updated_by from EquipmentTag order by created_on DESC;";
             SqlCommand cmdEquipmentData = new SqlCommand(EquipmentData_Str, con);
             SqlDataAdapter daEquipmentData = new SqlDataAdapter(cmdEquipmentData);
             daEquipmentData.Fill(DT_EquipmentData);
@@ -145,7 +145,7 @@ namespace DataTableExample.Controllers
             List<string> Eq_Types = new List<string>();
             SqlConnection con = new SqlConnection(ConnectionString);
             //int Area = Convert.ToInt32(Request.Form["ddlArea"].ToString());
-            string EqType = "select distinct Eq_Type,Eq_TypeDescription from EquipmentTag  where Area=@Area and  SNo is not null and eq_typedescription is not null;";
+            string EqType = "select distinct Eq_Type,Eq_TypeDescription from EquipmentTag  where   SNo is not null and eq_typedescription is not null;";
             SqlCommand cmd_EqType = new SqlCommand(EqType, con);
             cmd_EqType.Parameters.AddWithValue("@Area", Convert.ToInt32(SelectedArea.Substring(0, 2)));
             SqlDataAdapter daEqType = new SqlDataAdapter(cmd_EqType);
@@ -184,7 +184,14 @@ namespace DataTableExample.Controllers
             }
             else
             {
-                Seq_no = Convert.ToInt32(dtSequenceNo.Rows[0]["Sequence"].ToString());
+                if(dtSequenceNo.Rows[0]["Sequence"].ToString()!="")
+                {
+                    Seq_no = Convert.ToInt32(dtSequenceNo.Rows[0]["Sequence"].ToString());
+                }
+                else
+                {
+                    Seq_no = 1000;
+                }
             }
             Seq_no = Seq_no + 1;
             List<string> MaxSeq_no = new List<string>();
@@ -209,6 +216,7 @@ namespace DataTableExample.Controllers
             return Json(Seq_noCount, JsonRequestBehavior.AllowGet);
         }
 
+        [HttpPost]
         public ActionResult GetFLOCCode(string TagNo)
         {
             SqlConnection con = new SqlConnection(ConnectionString);

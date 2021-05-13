@@ -41,6 +41,11 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css" rel="stylesheet" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
     <script type="text/javascript">
             $(document).ready(function () {
                 // Setup - add a text input to each footer cell
@@ -196,7 +201,7 @@
             var Requestor = $('#txtRequestor').val().trim();
             var Project_Name = $('#txtProjectName').val().trim();
 
-            if (Selected_Area != null && Selected_EqType != null && Seq_no!=null && Equipment_Name!=null && PIDNo!=null && Area2!=null &&  Requestor!=null && Project_Name!=null )
+            if (Selected_Area != null && Selected_EqType != null && Seq_no!="" && Equipment_Name!="" && PIDNo!="" && Area2!="" &&  Requestor!="" && Project_Name!="" )
 			{
                     $.ajax({
                     url: '@Url.Action("AddEquipmentTypeDetails", "EquipmentTag")',
@@ -209,7 +214,7 @@
                         var res = data;
                         if (res == "Success") {
                         alert('Equipment Details Saved Successfully..');
-                            //window.location.href = '../Home/Equipment;
+                            window.location.href = '../EquipmentTag/EquipmentTag';
                         }
                     },
                     error: function (xhr) {
@@ -222,15 +227,17 @@
             }
             else
             {
-			alert('Please Enter all the Fields');
-                $("#failure-alertmap").text('Please enter value for all fields');
-                $("#failure-alertmap").show();
-                $("#failure-alertmap").delay(3000).addClass("in").fadeOut(1000);
-                return false;
+                ConfirmDialog('Please Enter all the Fields');
+                //alert('Please Enter all the Fields');
+               // window.location.href = '../EquipmentTag/EquipmentTag';
+                //$("#failure-alertmap").text('Please enter value for all fields');
+                //$("#failure-alertmap").show();
+                //$("#failure-alertmap").delay(3000).addClass("in").fadeOut(1000);
+                //return false;
             }
 
             //alert('Saved Successfully!!');
-            window.location.href = '../EquipmentTag/EquipmentTag';
+            //window.location.href = '../EquipmentTag/EquipmentTag';
         }
 
          function GetFLOCCode()
@@ -247,8 +254,11 @@
                     cache: false,
                         data: JSON.stringify({ 'TagNo': Tag_No}),
                     contentType: "application/json; charset=utf-8",
-                    success: function (data) {
-                        $("#txtFLOCCode").val(data[0].Text);
+                        success: function (data) {
+                            if (data != "") {
+                                ConfirmDialog('FLOC Code is Present For TagNumber You want to Edit!!');
+                                $("#txtFLOCCode").val(data);
+                            }
 
                     },
                     error: function (xhr) {
@@ -275,7 +285,7 @@
 
             var Tag_No = $('#txtTagNumber').val().trim();
             var FLOC_Code = $('#txtFLOCCode').val().trim();
-            if (Tag_No != null )
+            if (Tag_No != "" && FLOC_Code != "" )
 			{
                     $.ajax({
                     url: '@Url.Action("SaveFLOCcode", "EquipmentTag")',
@@ -284,8 +294,12 @@
                     cache: false,
                         data: JSON.stringify({ 'TagNo': Tag_No, 'FLOCCode': FLOC_Code}),
                     contentType: "application/json; charset=utf-8",
-                    success: function (data) {
-                        //$("#txtFLOCCode").val(data[0].Text);
+                        success: function (data) {
+                            var res = data;
+                            if (res == "Success") {
+                                alert('Saved Successfully..');
+                                window.location.href = '../EquipmentTag/EquipmentTag';
+                            }
 
                     },
                     error: function (xhr) {
@@ -303,9 +317,41 @@
                 return false;
             }
 
-            alert('Saved Successfully..');
-            window.location.href = 'https://localhost:44308/EquipmentTag/EquipmentTag';
+            //alert('Saved Successfully..');
+            //window.location.href = 'https://localhost:44308/EquipmentTag/EquipmentTag';
         }
+
+
+        function ConfirmDialog(message) {
+            $('<div></div>').appendTo('body')
+                .html('<div><h6>' + message + '?</h6></div>')
+                .dialog({
+                    modal: true,
+                    title: 'Confirmation Message',
+                    zIndex: 10000,
+                    autoOpen: true,
+                    width: 'auto',
+                    resizable: false,
+                    buttons: {
+                        Yes: function () {
+                            // $(obj).removeAttr('onclick');
+                            // $(obj).parents('.Parent').remove();
+
+                            $('body').append('<h1>Confirm Dialog Result: <i>Yes</i></h1>');
+
+                            $(this).dialog("close");
+                        },
+                        No: function () {
+                            $('body').append('<h1>Confirm Dialog Result: <i>No</i></h1>');
+
+                            $(this).dialog("close");
+                        }
+                    },
+                    close: function (event, ui) {
+                        $(this).remove();
+                    }
+                });
+        };
 
     </script>
     <style>
@@ -444,7 +490,7 @@
                                                         <!-- /.row -->
                                                         <div class="form-group row-cols-2">
                                                             <button type="submit" class="btn btn-info float-right" style="margin-left:30px;" onclick="EqDetailsSave()">Save</button>
-                                                            <button type="reset" class="btn btn-default float-right" style="margin-left:30px;" onclick="window.location.href='../Home/EquipmentTag';">Cancel</button>
+                                                            <button type="reset" class="btn btn-default float-right" style="margin-left:30px;" onclick="window.location.href='../EquipmentTag/EquipmentTag';">Cancel</button>
 
 
                                                         </div>
@@ -535,7 +581,7 @@
                                                             <!-- /.row -->
                                                             <div class="form-group row-cols-2">
                                                                 <button type="submit" class="btn btn-info float-right" style="margin-left:30px;" onclick="SaveFLOCcode()">Save</button>
-                                                                <button type="reset" class="btn btn-default float-right" style="margin-left:30px;" onclick="window.location.href='../Home/Equipment';">Cancel</button>
+                                                                <button type="reset" class="btn btn-default float-right" style="margin-left:30px;" onclick="window.location.href='../EquipmentTag/EquipmentTag';">Cancel</button>
                                                             </div>
                                                             <div class="form-group">
                                                                 <div class="col-md-offset-2 col-md-10" style="color:green">
