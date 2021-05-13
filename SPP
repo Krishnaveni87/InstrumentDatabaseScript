@@ -1,0 +1,37 @@
+USE [InstrumentDatabase]
+GO
+
+/****** Object:  StoredProcedure [dbo].[InsertEquipmentType]    Script Date: 13-05-2021 19:31:08 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE procedure [dbo].[InsertEquipmentType] 
+(  
+   @Area INTEGER, 
+   @Area_Description VARCHAR(500),
+   @Eq_Type VARCHAR(100),
+   @Eq_TypeDescription VARCHAR(500),
+   @Tag VARCHAR(100),
+   @Equipment_Name VARCHAR(200),
+   @P_ID varchar(200),  
+   @Eq VARCHAR(200),  
+   @FLOC_Status bit,
+   @Area2 VARCHAR(200),
+   @Requestor VARCHAR(200),
+   @Project_Name VARCHAR(200),
+   @Created_on datetime,
+   @Created_by VARCHAR(100),
+   @Updated_on datetime,
+   @Updated_by VARCHAR(100)
+)  
+AS  
+BEGIN   
+insert into EquipmentTag(Area,Area_Description,Eq_Type,Eq_TypeDescription,Tag,P_ID,Eq,FLOC_Status,Area2,Equipment_Name,Requestor,Project_Name,Created_on,Created_by,Updated_on,Updated_by) 
+values( @Area,@Area_Description, @Eq_Type,@Eq_TypeDescription, @Tag, @P_ID, @Eq,@FLOC_Status,@Area2,@Equipment_Name,@Requestor,@Project_Name,@Created_on,@Created_by,@Updated_on,@Updated_by)  
+End
+GO
+
+
