@@ -1,0 +1,629 @@
+﻿
+@{
+    ViewBag.Title = "EquipmentTagGeneration";
+}
+
+
+@using System.Data
+@model DataTable
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>
+        Equipment Numbering System
+    </title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,700,900" rel="stylesheet">
+    <link href="../../Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="../../Content/font-awesome.min.css" rel="stylesheet" />
+    <link href="../../Content/owl.carousel.css" rel="stylesheet" />
+    <link href="../../Content/owl.theme.css" rel="stylesheet" />
+    <link href="~/Content/meanmenu.min.css" rel="stylesheet" />
+    <link href="~/Content/jquery.mCustomScrollbar.min.css" rel="stylesheet" />
+    <link href="~/Content/animate.min.css" rel="stylesheet" />
+    <link href="~/Content/normalize.css" rel="stylesheet" />
+    <link href="~/Content/waves.min.css" rel="stylesheet" />
+    <link href="~/Content/button.css" rel="stylesheet" />
+    <link href="~/Content/main.css" rel="stylesheet" />
+    <link href="~/Content/style.css" rel="stylesheet" />
+    <link href="~/Content/responsee.css" rel="stylesheet" />
+    <script src="~/Scripts/modernizr-2.8.3.js"></script>
+    <link rel="stylesheet" href="../../Content/jquery.dataTables.min.css" />
+    <link href="../../Content/fixedHeader.dataTables.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/Views/Home/HomeStyle.css">
+    <script src="../../Scripts/jquery-3.5.1.js"></script>
+    <script src="../../Scripts/jquery.dataTables.min.js" defer></script>
+    <script src="../../Scripts/dataTables.fixedHeader.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css" rel="stylesheet" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+
+    <style>
+        tr.redClass {
+            color: red;
+        }
+
+        table.display th {
+            font-size: 16px;
+        }
+
+        table.display td {
+            font-size: 16px;
+        }
+
+        .tableFixHead {
+            height: 600px;
+        }
+
+        div #example_filter input {
+            background-color: snow;
+        }
+
+        .dataTables_scrollBody {
+            height: 600px;
+        }
+    </style>
+</head>
+@using (Html.BeginForm())
+{
+    //@Html.AntiForgeryToken()
+    <body>
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="widget-tabs-int mg-t-30">
+                    <div class="tab-hd">
+                        <img class="imgstyle" src="~/Images/pgsvg.svg" alt="" />
+                        <h2 style="font-weight:900">Equipment Number Generating System</h2>
+                        <div class="sidetab" style="float:right;margin-top:-4%">
+                            <button class="btn" onclick="window.location.href='../Home/Index'"><i class="fa fa-home"></i> Home</button>
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="widget-tabs-list tab-pt-mg">
+
+                                <ul class="nav nav-tabs tab-nav-center ul_font">
+                                </ul>
+                                <div class="tab-content tab-custom-st">
+                                    <div id="dummy">
+                                        <p>
+                                            <button class="btn btn-primary" type="button" data-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                                                Generate Equipment Tag
+                                            </button>
+                                            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample1" aria-expanded="false" aria-controls="collapseExample1">
+                                                Update FLOC Code
+                                            </button>
+                                            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample3" aria-expanded="false" aria-controls="collapseExample1">
+                                                Export
+                                            </button>
+                                        </p>
+                                        <div class="collapse" id="collapseExample" data-parent="#dummy">
+
+                                            <div class="card-body" style="background-color: #4088ac">
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+
+                                                            <label>Area:</label>
+                                                            @*ViewBag.AreaList is holding all the Area values*@
+                                                            @Html.DropDownList("ddlArea", (IEnumerable<SelectListItem>)ViewData["Area_LstTargests"], new { @class = "form-control" })
+                                                            <label id="lblArea" class="text-danger" style="color:red !important"></label>
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label>Equipment Name:</label>
+                                                            <input type="text" id="txtEQName" name="txtInstName" class="form-control">
+                                                            <label id="lblEQName" class="text-danger" style="color:red !important"></label>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>Requestor:</label>
+                                                            <input type="text" id="txtRequestor" name="txtInstName" class="form-control">
+                                                            <label id="lblRequestor" class="text-danger" style="color:red !important"></label>
+                                                        </div>
+                                                        <!-- /.form-group -->
+                                                    </div>
+                                                    <!-- /.col -->
+                                                    <div class="col-md-4">
+
+                                                        <div class="form-group">
+                                                            <label>Equipment Type:</label>
+                                                            @*ViewBag.Eq_Types is holding all the Equipment values*@
+                                                            @Html.DropDownList("ddlEqType", (IEnumerable<SelectListItem>)ViewData["Eq_TypeDescriptionTarget"], new { @class = "form-control", @onchange = "GetMaxSeq_no()" })
+                                                            <label id="lblEqType" class="text-danger" style="color:red !important"></label>
+                                                        </div>
+                                                        <!-- /.form-group -->
+                                                        <div class="form-group">
+                                                            <label>P&ID No:</label>
+                                                            <input type="text" id="txtPIDNo" name="txtPIDNo" class="form-control">
+                                                            <label id="lblPIDNo" class="text-danger" style="color:red !important"></label>
+                                                        </div>
+                                                        <!-- /.form-group -->
+                                                        <div class="form-group">
+                                                            <label>Project Name:</label>
+                                                            <input type="text" id="txtProjectName" name="txtProjectName" class="form-control">
+                                                            <label id="lblProjectName" class="text-danger" style="color:red !important"></label>
+                                                        </div>
+                                                    </div>
+                                                    <!-- /.col -->
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label>Sequence Number</label>
+                                                            @Html.TextBox("txtSequenceNo", (int)ViewData["seq_no"], new { @type = "text", @class = "form-control", autocomplete = "off", @placeholder = "Seq No", @autofocus = "autofocus", @required = "required", @pattern = "[0-9]", @onkeypress = "return isNumberKey(this,event)" })
+                                                            <label id="lblSequenceNo" class="text-danger" style="color:red !important"></label>
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label>Area2:</label>
+                                                            @*ViewBag.Area2List is holding all the Area2 values*@
+                                                            @Html.DropDownList("ddlArea2", (IEnumerable<SelectListItem>)ViewData["Area2_LstTargests"], new { @class = "form-control" })
+                                                            <label id="lblArea2" class="text-danger" style="color:red !important"></label>
+                                                        </div>
+
+
+                                                    </div>
+
+                                                </div>
+                                                <!-- /.row -->
+                                                <div class="form-group row-cols-2 text-right">
+                                                    <button type="button" id="saveEq" class="btn btn-info float-right" style="margin-left:30px;" onclick="EqDetailsSave()">Save</button>
+                                                    <button type="reset" class="btn btn-default float-right" style="margin-left:30px;" onclick="window.location.href='../EquipmentTag/EquipmentTag';">Cancel</button>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="col-md-offset-2 col-md-10" style="color:green">
+                                                        @ViewBag.Message
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="collapse" id="collapseExample1" data-parent="#dummy">
+
+                                            <div class="card-body" style="background-color: #4088ac">
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label>TagNumber</label>
+                                                            @Html.Editor("txtTagNumber", new { htmlAttributes = new { @class = "form-control", @onchange = "GetEQCode()" } })
+                                                            <label id="lblTagNumber" class="text-danger" style="color:red !important"></label>
+                                                            @Html.DropDownList("ddlTagNumber", (IEnumerable<SelectListItem>)ViewData["Tag_CodeTar"], new { @class = "form-control", @onchange = "GetFLCin_FLOC()" })
+                                                            <label id="lblTagNumberDrp" class="text-danger" style="color:red !important"></label>
+                                                           
+
+                                                        </div>
+                                                    </div>
+                                                    <!-- /.col -->
+                                                    <div class="col-md-4">
+
+                                                        <div class="form-group">
+                                                            <label>FLOC Code:</label>
+                                                            @Html.Editor("txtFLOCCode", new { htmlAttributes = new { @class = "form-control" } })
+                                                            <label id="lblFLOCCode" class="text-danger" style="color:red !important"></label>
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+                                                <!-- /.row -->
+                                                <div class="form-group row-cols-2">
+                                                    <button type="submit" id="saveUpdates" class="btn btn-info float-right" style="margin-left:30px;" onclick="SaveFLOCcode()">Save</button>
+                                                    <button type="reset" class="btn btn-default float-right" style="margin-left:30px;" onclick="window.location.href='../EquipmentTag/EquipmentTag';">Cancel</button>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="col-md-offset-2 col-md-10" style="color:green">
+                                                        @ViewBag.Message
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="collapse" id="collapseExample3" data-parent="#dummy">
+
+                                            <button id="exporttable" class="btn btn-primary" type="button" d aria-expanded="false" aria-controls="collapseExample1">
+                                                Excel
+                                            </button>
+                                            <button id="pdftable" class="btn btn-primary" type="button" aria-expanded="false" aria-controls="collapseExample1" onclick="generate()">
+                                                Pdf
+                                            </button>
+
+                                        </div>
+
+                                    </div>
+                                    <div id="home3" class="tab-pane in active animated zoomInLeft">
+                                        <div class="tab-ctn p-t-5">
+
+
+                                        </div>
+                                        <div>
+                                            <table id="example" class="display tableFixHead" style="width:100%">
+
+                                                <thead>
+                                                    <tr>
+                                                        @foreach (DataColumn col in Model.Columns)
+                                                        {
+                                                            <th>
+                                                                @col.ColumnName.Replace("_", " ")
+                                                            </th>
+                                                        }
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (DataRow row in Model.Rows)
+                                                    {
+                                                        <tr>
+                                                            @foreach (DataColumn col in Model.Columns)
+                                                            {
+                                                                <td>
+                                                                    @row[col.ColumnName]
+                                                                </td>
+                                                            }
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            function ValidateEquip() {
+                var success = true;
+                if ($('#ddlArea').val() == "--Select--")
+                {
+                    $('#lblArea').text("Please Select Area");
+                    success = false;
+                }
+                if ($('#txtEQName').val() == "") {
+                    $('#lblEQName').text("Equipment Name not filled");
+                    success = false;
+                }
+                if ($('#txtRequestor').val() == "") {
+                    $('#lblRequestor').text("Requestor not filled");
+                    success = false;
+                }
+                if ($('#ddlEqType').val() == "--Select--") {
+                    $('#lblEqType').text("Please Select EQ Type");
+                    success = false;
+                }
+                if ($('#txtPIDNo').val() == "") {
+                    $('#lblPIDNo').text("P&ID Number not filled");
+                    success = false;
+                }
+                if ($('#txtProjectName').val() == "") {
+                    $('#lblProjectName').text("ProjectName not filled");
+                    success = false;
+                }
+                if ($('#txtSequenceNo').val() == "") {
+                    $('#lblSequenceNo').text("SequenceNo not filled");
+                    success = false;
+                }
+                if ($('#ddlArea2').val() == "") {
+                    $('#lblArea2').text("Please Select Area2");
+                    success = false;
+                }
+                if (success == true)
+                    return true;
+                else
+                    return false;
+            }
+
+            function ValidateFLOC() {
+                var success = true;
+                if ($('#ddlTagNumber').val() == "--Select--") {
+                    $('#lblTagNumberDrp').text("Please Select EquipmentNumber");
+                    success = false;
+                }
+                if ($('#txtTagNumber').val() == "") {
+                    $('#lblTagNumber').text("TagNumber not filled");
+                    success = false;
+                }
+                if ($('#txtFLOCCode').val() == "") {
+                    $('#lblFLOCCode').text("FLOC Code not filled");
+                    success = false;
+                }
+                                           
+             if (success == true)
+                    return true;
+                else
+                    return false;
+            }
+
+            function EqDetailsSave()
+            {
+            if (ValidateEquip())
+            {
+                var Selected_Area = $('#ddlArea').val().trim();
+                var Selected_EqType = $("#ddlEqType option:selected").text();
+                //var Selected_EqType = $('#ddlEqType').val().trim();
+                var Seq_no = $('#txtSequenceNo').val().trim();
+                var Equipment_Name = $('#txtEQName').val().trim();
+                var PIDNo = $('#txtPIDNo').val().trim();
+                var Area2 = $('#ddlArea2').val().trim();
+                var Requestor = $('#txtRequestor').val().trim();
+                var Project_Name = $('#txtProjectName').val().trim();
+                if (Selected_Area != null && Selected_EqType != null && Seq_no != "" && Equipment_Name != "" && PIDNo != "" && Area2 != "" && Requestor != "" && Project_Name != "") {
+                    $.ajax({
+                        url: '@Url.Action("AddEquipmentTypeDetails", "EquipmentTagGeneration")',
+                        dataType: "json",
+                        type: "POST",
+                        cache: false,
+                        data: JSON.stringify({ 'Area': Selected_Area, 'Eq_Type': Selected_EqType, 'Seq_No': Seq_no, 'Eq_name': Equipment_Name, 'PIDNo': PIDNo, 'Areas2': Area2, 'Requestor': Requestor, 'Project_Name': Project_Name }),
+                        contentType: "application/json; charset=utf-8",
+                        success: function (data) {
+                            var res = data;
+                            if (res == "Success") {
+                                alert('Equipment Details Saved Successfully..');
+                                window.location.href = '../EquipmentTagGeneration/EquipmentTagGeneration';
+                            }
+                        },
+                        error: function (xhr) {
+                            $("#failure-alertmap").text('Error');
+                            $("#failure-alertmap").show();
+                            $("#failure-alertmap").delay(3000).addClass("in").fadeOut(1000);
+                        }
+                    });
+                }
+                else {
+                    //ConfirmDialog('Please Enter all the Fields');
+                    //alert('Please Enter all the Fields');
+                    // window.location.href = '../EquipmentTag/EquipmentTag';
+                    //$("#failure-alertmap").text('Please enter value for all fields');
+                    //$("#failure-alertmap").show();
+                    //$("#failure-alertmap").delay(3000).addClass("in").fadeOut(1000);
+                    //return false;
+                }
+                //alert('Saved Successfully!!');
+                //window.location.href = '../EquipmentTag/EquipmentTag';
+            }
+            }
+
+                function GetEQCode()
+          {
+
+            var Tag_No = $('#txtTagNumber').val().trim();
+
+            if (Tag_No != null )
+			{
+                    $.ajax({
+                    url: '@Url.Action("GetEQCode", "EquipmentTagGeneration")',
+                    dataType: "json",
+                    type: "POST",
+                    cache: false,
+                        data: JSON.stringify({ 'TagNo': Tag_No}),
+                    contentType: "application/json; charset=utf-8",
+                        success: function (data) {
+                            var markup = "<option value='0'>--Select--</option>";
+                            for (var x = 0; x < data.length; x++) {
+                                markup += "<option value=" + data[x].Text + ">" + data[x].Text + "</option>";
+                            }
+                            $("#ddlTagNumber").html(markup).show();
+
+                        },
+                    error: function (xhr) {
+                        $("#failure-alertmap").text('Error');
+                        $("#failure-alertmap").show();
+                        $("#failure-alertmap").delay(3000).addClass("in").fadeOut(1000);
+                    }
+                });
+
+            } else {
+			//alert('Please Enter all the Fields');
+                $("#failure-alertmap").text('Please enter value for all fields');
+                $("#failure-alertmap").show();
+                $("#failure-alertmap").delay(3000).addClass("in").fadeOut(1000);
+                //return false;
+            }
+            }
+
+              function GetFLCin_FLOC() {
+            var Tag_No = $('#txtTagNumber').val().trim();
+            var EQ_Code = $('#ddlTagNumber').val().trim();
+            if (Tag_No != null && EQ_Code!=null )
+			{
+                    $.ajax({
+                    url: '@Url.Action("GetFLCin_FLOC", "EquipmentTagGeneration")',
+                    dataType: "json",
+                    type: "POST",
+                    cache: false,
+                        data: JSON.stringify({ 'TagNo': Tag_No, 'EQCode': EQ_Code}),
+                    contentType: "application/json; charset=utf-8",
+                        success: function (data) {
+                            if (data[0].Text  != "") {
+                                ConfirmDialog("FLOC code is already present for this TagNumber!!You Want to Change")
+                                $("#txtFLOCCode").val(data[0].Text);
+                            }
+
+                        },
+                    error: function (xhr) {
+                        $("#failure-alertmap").text('Error');
+                        $("#failure-alertmap").show();
+                        $("#failure-alertmap").delay(3000).addClass("in").fadeOut(1000);
+                    }
+                });
+
+            } else {
+			//alert('Please Enter all the Fields');
+                $("#failure-alertmap").text('Please enter value for all fields');
+                $("#failure-alertmap").show();
+                $("#failure-alertmap").delay(3000).addClass("in").fadeOut(1000);
+                //return false;
+            }
+        }
+
+            function SaveFLOCcode()
+            {
+                if (ValidateFLOC()) {
+                    var Tag_No = $('#txtTagNumber').val().trim();
+                    var EQ_Code = $('#ddlTagNumber').val().trim();
+                    var FLOC_Code = $('#txtFLOCCode').val().trim();
+                    if (Tag_No != "" && FLOC_Code != "") {
+                        $.ajax({
+                            url: '@Url.Action("SaveFLOCcode", "EquipmentTagGeneration")',
+                            dataType: "json",
+                            type: "POST",
+                            cache: false,
+                            data: JSON.stringify({ 'EQCode': EQ_Code, 'FLOCCode': FLOC_Code }),
+                            contentType: "application/json; charset=utf-8",
+                            success: function (data) {
+                                var res = data;
+                                if (res == "Success") {
+                                    alert('Saved Successfully..');
+                                    
+                                    window.location.href = '../EquipmentTagGeneration/EquipmentTagGeneration';
+                                }
+
+                            },
+                            error: function (xhr) {
+                                $("#failure-alertmap").text('Error');
+                                $("#failure-alertmap").show();
+                                $("#failure-alertmap").delay(3000).addClass("in").fadeOut(1000);
+                            }
+                        });
+                    } else {
+                        //alert('Please Enter all the Fields');
+                        $("#failure-alertmap").text('Please enter value for all fields');
+                        $("#failure-alertmap").show();
+                        $("#failure-alertmap").delay(3000).addClass("in").fadeOut(1000);
+                        //return false;
+                    }
+                    //alert('Saved Successfully..');
+                    //window.location.href = 'https://localhost:44308/EquipmentTag/EquipmentTag';
+                }
+            }
+
+
+
+        $(function () {
+            $("#exporttable").click(function (e) {
+                var table = $("#example");
+                if (table && table.length) {
+                    $(table).table2excel({
+                        exclude: ".noExl",
+                        name: "Excel Document Name",
+                        filename: "Equipment_tag" + new Date().toISOString().replace(/[\-\:\.]/g, "") + ".xls",
+                        fileext: ".xls",
+                        exclude_img: true,
+                        exclude_links: true,
+                        exclude_inputs: true,
+                        preserveColors: false
+                    });
+                }
+            });
+            });
+            function GetMaxSeq_no() {
+            var Selected_Area = $('#ddlArea').val().trim();
+            var Selected_EqType = $('#ddlEqType').val().trim();
+             //alert(Selected_EqType);
+             if (Selected_Area != null && Selected_EqType != null ) {
+                    $.ajax({
+                    url: '@Url.Action("GetMaxSeq_NO", "EquipmentTagGeneration")',
+                    dataType: "json",
+                    type: "POST",
+                    cache: false,
+                        data: JSON.stringify({ 'SelectedArea': Selected_Area, 'SelectedEqType': Selected_EqType}),
+                    contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                        var markup = data;
+                        $("#txtSequenceNo").val(data[0].Text);
+                    },
+                    error: function (xhr) {
+                        $("#failure-alertmap").text('Error');
+                        $("#failure-alertmap").show();
+                        $("#failure-alertmap").delay(3000).addClass("in").fadeOut(1000);
+                    }
+                });
+            } else {
+                $("#failure-alertmap").text('Please enter value for all fields');
+                $("#failure-alertmap").show();
+                $("#failure-alertmap").delay(3000).addClass("in").fadeOut(1000);
+                return false;
+            }
+            //alert('Saved Successfully!!');
+            }
+
+
+            function ConfirmDialog(message) {
+                $('<div></div>').appendTo('body')
+                    .html('<div><h6>' + message + '?</h6></div>')
+                    .dialog({
+                        modal: true,
+                        title: 'Confirmation Message',
+                        zIndex: 10000,
+                        autoOpen: true,
+                        width: 'auto',
+                        resizable: false,
+                        buttons: {
+                            Yes: function () {
+
+
+                                $('body').append('<h1>Confirm Dialog Result: <i>Yes</i></h1>');
+
+                                $(this).dialog("close");
+                            },
+                            No: function () {
+                                $('body').append('<h1>Confirm Dialog Result: <i>No</i></h1>');
+
+                                $(this).dialog("close");
+                            }
+                        },
+                        close: function (event, ui) {
+                            $(this).remove();
+                        }
+                    });
+            };
+        function generate() {
+            var doc = new jsPDF('p', 'pt', 'letter');
+            var htmlstring = '';
+            var tempVarToCheckPageHeight = 0;
+            var pageHeight = 0;
+            pageHeight = doc.internal.pageSize.height;
+            specialElementHandlers = {
+                // element with id of "bypass" - jQuery style selector
+                '#bypassme': function (element, renderer) {
+                    // true = "handled elsewhere, bypass text extraction"
+                    return true
+                }
+            };
+            margins = {
+                top: 150,
+                bottom: 60,
+                left: 40,
+                right: 40,
+                width: 600
+            };
+            var y = 20;
+            doc.setLineWidth(2);
+            doc.text(200, y = y + 30, "Equipment Tag");
+            doc.autoTable({
+                html: '#example',
+                startY: 70,
+                theme: 'grid',
+                styles: {
+                    minCellHeight: 20
+                }
+            })
+            doc.save('Equipment_Tag.pdf');
+        }
+        jQuery('button').not($("#saveEq,#saveUpdates")).click(function (e) {
+            jQuery('.collapse').collapse('hide');
+        });
+        </script>
+
+    </body>
+}
+</html>
+
