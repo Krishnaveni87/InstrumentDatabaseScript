@@ -1,4 +1,6 @@
-﻿
+﻿using InstrumentDatabase.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -6,16 +8,13 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
+using System.Web.Helpers;
 using System.Web.Mvc;
-using InstrumentDatabase.Model;
 
 namespace InstrumentDatabase.Controllers
 {
     public class HomeController : Controller
     {
-        string ConnectionString = ConfigurationManager.ConnectionStrings["cons"].ConnectionString;
-
-        //SqlConnection con = new SqlConnection(ConnectionString);
 
         DataSet dsFinalTable = new DataSet();
         public ActionResult Index()
@@ -37,13 +36,35 @@ namespace InstrumentDatabase.Controllers
         //    return View();
         //}
 
-
-
-        public ActionResult DataTable()
+        public ActionResult Homepage()
         {
             return View();
         }
-        public ActionResult TabsOverview()
+        public ActionResult Equipment()
+        {
+            DataTable DT_Equipment = GetEquipmentData();
+            return View(DT_Equipment);
+        }
+
+        //public ActionResult InstMultiForm()
+        //{
+        //    return View();
+        //}
+        public ActionResult InstType()
+        {
+            return View();
+        }
+
+        public ActionResult InstDescription()
+        {
+            return View();
+        }
+
+        public ViewResult DataTable()
+        {
+            return View();
+        }
+        public ViewResult TabsOverview()
         {
             DataTable dtHome = HomeTabTableView();
 
@@ -54,7 +75,7 @@ namespace InstrumentDatabase.Controllers
             DataTable dtInstType = InstTypeTableView();
             DataTable dtInfoType = InfoTypeTableView();
             DataTable dtInfoGroups = InfoGroupsTableView();
-            DataTable dtLoopTable = LoopTableView();
+            //DataTable dtLoopTable = LoopTableView();
             DataTable dt_inst = EquipmentData();
 
             dsFinalTable.Tables.Add(dtHome);
@@ -65,10 +86,16 @@ namespace InstrumentDatabase.Controllers
             dsFinalTable.Tables.Add(dtInstType);
             dsFinalTable.Tables.Add(dtInfoType);
             dsFinalTable.Tables.Add(dtInfoGroups);
-            dsFinalTable.Tables.Add(dtLoopTable);
-            dsFinalTable.Tables.Add(dt_inst);
+            //dsFinalTable.Tables.Add(dtLoopTable);
+            //dsFinalTable.Tables.Add(dt_inst);
+
+            //string JSONString = JsonConvert.SerializeObject(dsFinalTable);
+
+            //JObject json = JObject.Parse(JSONString);
 
             return View(dsFinalTable);
+
+
         }
 
         private DataTable InfoGroupsTableView()
@@ -78,7 +105,7 @@ namespace InstrumentDatabase.Controllers
 
             SqlConnection con = new SqlConnection(ConnectionString);
 
-            SqlCommand cmdInstrumentCount = new SqlCommand("select distinct [Information_Group], [Group_Seq_No] FROM [InstrumentDatabase].[dbo].[InstrumentData] GROUP BY [Information_Group], [Group_Seq_No]", con);
+            SqlCommand cmdInstrumentCount = new SqlCommand("  select distinct [Information_Group], [Group_Seq_No] FROM  [InstrumentTable] GROUP BY [Information_Group], [Group_Seq_No]", con);
 
             con.Open();
             SqlDataAdapter daInstrumentCount = new SqlDataAdapter(cmdInstrumentCount);
@@ -99,7 +126,7 @@ namespace InstrumentDatabase.Controllers
 
             SqlConnection con = new SqlConnection(ConnectionString);
 
-            SqlCommand cmdInstrumentCount = new SqlCommand("select distinct [Information_Type],[Unit],[Min_Norm_Max_Field], count(*) as InfoRecordCount FROM [InstrumentDatabase].[dbo].[InstrumentData] GROUP BY [Information_Type],[Unit],[Min_Norm_Max_Field]", con);
+            SqlCommand cmdInstrumentCount = new SqlCommand("select distinct [Information_Type],[Unit],[Min_Norm_Max_Field], count(*) as InfoRecordCount FROM [InstrumentTable] GROUP BY [Information_Type],[Unit],[Min_Norm_Max_Field]", con);
 
             con.Open();
             SqlDataAdapter daInstrumentCount = new SqlDataAdapter(cmdInstrumentCount);
@@ -120,7 +147,7 @@ namespace InstrumentDatabase.Controllers
 
             SqlConnection con = new SqlConnection(ConnectionString);
 
-            SqlCommand cmdInstrumentCount = new SqlCommand("select distinct [Instrument_Type], count(*) as InstrumentCount, [Instrument_Template_Line_Count] FROM [InstrumentDatabase].[dbo].[Instruments] GROUP BY [Instrument_Type],[Instrument_Template_Line_Count]", con);
+            SqlCommand cmdInstrumentCount = new SqlCommand("select distinct [Instrument_Type], count(*) as InstrumentCount, [Instrument_Template_Line_Count] FROM [Instruments] GROUP BY [Instrument_Type],[Instrument_Template_Line_Count]", con);
 
             con.Open();
             SqlDataAdapter daInstrumentCount = new SqlDataAdapter(cmdInstrumentCount);
@@ -142,7 +169,7 @@ namespace InstrumentDatabase.Controllers
 
             SqlConnection con = new SqlConnection(ConnectionString);
 
-            SqlCommand cmdInstrumentCount = new SqlCommand("select distinct [Seq_No],[Instrument_Type],[Information_Type],[Unit],[Information_Group],[Group_Seq_No], count(*) as InfoRecordCount FROM [InstrumentDatabase].[dbo].[InstrumentData] GROUP BY [Seq_No],[Instrument_Type],[Information_Type],[Unit],[Information_Group],[Group_Seq_No]", con);
+            SqlCommand cmdInstrumentCount = new SqlCommand("select distinct [Seq_No],[Instrument_Type],[Information_Type],[Unit],[Information_Group],[Group_Seq_No], count(*) as InfoRecordCount FROM  [InstrumentTable] GROUP BY [Seq_No],[Instrument_Type],[Information_Type],[Unit],[Information_Group],[Group_Seq_No]", con);
 
             con.Open();
             SqlDataAdapter daInstrumentCount = new SqlDataAdapter(cmdInstrumentCount);
@@ -155,13 +182,90 @@ namespace InstrumentDatabase.Controllers
             return FinalTable;
         }
 
+       
+        public ActionResult InstrumentDetails(string Countrow, string Instrument_Type,string Area)
+        {
+            string str_InstrumentDetails = string.Empty;
+            string ConnectionString = ConfigurationManager.ConnectionStrings["cons"].ConnectionString;
+
+            SqlConnection con = new SqlConnection(ConnectionString);
+
+            if (Instrument_Type == "(empty)" && Area == "(empty)")
+            {
+                str_InstrumentDetails = "select Instrument_Type,TagName,Loop_No,Description,Type,Area,PID_No,Model_No,Needs_Updating,Spec_Info from Instruments where  Instrument_Type is null and  Area is null ;";
+            }
+            else if(Instrument_Type != "(empty)" && Area == "(empty)")
+            {
+                str_InstrumentDetails = "select  Instrument_Type,TagName,Loop_No,Description,Type,Area,PID_No,Model_No,Needs_Updating,Spec_Info from Instruments where  Instrument_Type =@Instrument_Type and  Area is null ;";
+            }
+            else if (Instrument_Type == "(empty)" && Area != "(empty)")
+            {
+                str_InstrumentDetails = "select Instrument_Type,TagName,Loop_No,Description,Type,Area,PID_No,Model_No,Needs_Updating,Spec_Info from Instruments where  Instrument_Type  is null and  Area=@Area ;";
+            }
+            //else if(Countrow=="-")
+            //{
+
+            //}
+            //else if(Instrument_Type=="")
+            //{
+
+            //}
+            //else if(Area=="")
+            //{
+
+            //}
+            else
+            {
+                str_InstrumentDetails = "select Instrument_Type,TagName,Loop_No,Description,Type,Area,PID_No,Model_No,Needs_Updating,Spec_Info  from Instruments where  Instrument_Type=@Instrument_Type and  Area=@Area ;";
+            }
+            con.Open();
+            SqlCommand cmdInstrumentDetails = new SqlCommand(str_InstrumentDetails, con);
+            cmdInstrumentDetails.Parameters.AddWithValue("@Instrument_Type", Instrument_Type);
+            cmdInstrumentDetails.Parameters.AddWithValue("@Area", Area);
+            SqlDataAdapter daInstrumentDetails = new SqlDataAdapter(cmdInstrumentDetails);
+            DataTable dtInstrumentDetails = new DataTable();
+            daInstrumentDetails.Fill(dtInstrumentDetails);
+            if(dtInstrumentDetails.Rows.Count==0 && Countrow=="-")
+            {
+                return Json("Page is Empty", JsonRequestBehavior.AllowGet);
+            }
+            //dsFinalTable.Tables.Add(dtInstrumentDetails);
+            //return dtInstrumentDetails;
+            ViewData.Model = dtInstrumentDetails.AsEnumerable();
+           String STR_DT= ConvertDataTabletoString(dtInstrumentDetails);
+            return Json(STR_DT, JsonRequestBehavior.AllowGet);
+            //var DatatableInstDetails = new SelectList((System.Collections.IEnumerable)dtInstrumentDetails);
+           // return View((, JsonRequestBehavior.AllowGet);
+        }
+
+        public string ConvertDataTabletoString(DataTable dt)
+        {
+            //DataTable dt = new DataTable();
+           
+                    System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+                    List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
+                    Dictionary<string, object> row;
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        row = new Dictionary<string, object>();
+                        foreach (DataColumn col in dt.Columns)
+                        {
+                            row.Add(col.ColumnName, dr[col]);
+                        }
+                        rows.Add(row);
+                    }
+                    return serializer.Serialize(rows);
+              
+        }
 
         private DataTable LoopTableView()
         {
-            
+            string connectionString = string.Empty;
+            string ConnectionString = ConfigurationManager.ConnectionStrings["cons"].ConnectionString;
+
             SqlConnection con = new SqlConnection(ConnectionString);
 
-            SqlCommand cmdInstrumentCount = new SqlCommand("select distinct [Vendor],[Vendor_Contact],[Vendor_PhoneNo], count(*) FROM [InstrumentDatabase].[dbo].[Instruments] GROUP BY [Vendor],[Vendor_Contact],[Vendor_PhoneNo]", con);
+            SqlCommand cmdInstrumentCount = new SqlCommand("select distinct [Vendor],[Vendor_Contact],[Vendor_PhoneNo], count(*) as VendorCount FROM  [Instruments] GROUP BY [Vendor],[Vendor_Contact],[Vendor_PhoneNo]", con);
 
             con.Open();
             SqlDataAdapter daInstrumentCount = new SqlDataAdapter(cmdInstrumentCount);
@@ -171,16 +275,20 @@ namespace InstrumentDatabase.Controllers
 
             FinalTable = dtInstrumentCount;
 
+            con.Close();
             return FinalTable;
         }
 
+
         private DataTable ManufacturerTableView()
         {
-           
+            string connectionString = string.Empty;
+
+            string ConnectionString = ConfigurationManager.ConnectionStrings["cons"].ConnectionString;
 
             SqlConnection con = new SqlConnection(ConnectionString);
 
-            SqlCommand cmdInstrumentCount = new SqlCommand("select distinct [Manufacturer],[Manufacturer_PhoneNo] as PhoneNo, count(*) FROM [InstrumentDatabase].[dbo].[Instruments] GROUP BY [Manufacturer],[Manufacturer_PhoneNo]", con);
+            SqlCommand cmdInstrumentCount = new SqlCommand("select distinct [Manufacturer],[Manufacturer_PhoneNo] as PhoneNo, count(*) as InstrumentCount FROM  [Instruments] GROUP BY [Manufacturer],[Manufacturer_PhoneNo]", con);
 
             con.Open();
             SqlDataAdapter daInstrumentCount = new SqlDataAdapter(cmdInstrumentCount);
@@ -190,15 +298,20 @@ namespace InstrumentDatabase.Controllers
 
             FinalTable = dtInstrumentCount;
 
+            con.Close();
             return FinalTable;
         }
 
         private DataTable VendorTableView()
         {
+            string connectionString = string.Empty;
+
+            string ConnectionString = ConfigurationManager.ConnectionStrings["cons"].ConnectionString;
+
             SqlConnection con = new SqlConnection(ConnectionString);
 
             //SqlCommand cmdInstrumentCount = new SqlCommand("select Instrument_type,Area ,count(*) as Instrument_Count from Instruments group by Area,Instrument_Type order by Instrument_Type,Area", con);
-            SqlCommand cmdInstrumentCount = new SqlCommand("select distinct[Vendor],[Vendor_Contact],[Vendor_PhoneNo], count(*) FROM[InstrumentDatabase].[dbo].[Instruments] GROUP BY[Vendor],[Vendor_Contact],[Vendor_PhoneNo]", con);
+            SqlCommand cmdInstrumentCount = new SqlCommand("select distinct[Vendor],[Vendor_Contact],[Vendor_PhoneNo], count(*) as InstrumentCount FROM [Instruments] GROUP BY[Vendor],[Vendor_Contact],[Vendor_PhoneNo]", con);
 
             con.Open();
             SqlDataAdapter daInstrumentCount = new SqlDataAdapter(cmdInstrumentCount);
@@ -208,6 +321,7 @@ namespace InstrumentDatabase.Controllers
 
             FinalTable = dtInstrumentCount;
 
+            con.Close();
             return FinalTable;
         }
 
@@ -219,7 +333,9 @@ namespace InstrumentDatabase.Controllers
 
         private DataTable InstrumentsTableView()
         {
-           
+            string connectionString = string.Empty;
+
+            string ConnectionString = ConfigurationManager.ConnectionStrings["cons"].ConnectionString;
 
             SqlConnection con = new SqlConnection(ConnectionString);
 
@@ -242,11 +358,17 @@ namespace InstrumentDatabase.Controllers
         /// </summary>
         private DataTable EquipmentData()
         {
+            string ConnectionString = ConfigurationManager.ConnectionStrings["cons"].ConnectionString;
+
             SqlConnection con = new SqlConnection(ConnectionString);
+
+
+            //SqlConnection con = new SqlConnection("data source =.; database = InstrumentDatabase; integrated security = True");
             SqlCommand cmd_AreaLst = new SqlCommand("select * from EquipmentTag  where SNo is not null;", con);
             SqlDataAdapter daArea_Lst = new SqlDataAdapter(cmd_AreaLst);
             DataTable dtArea_Lst = new DataTable();
             daArea_Lst.Fill(dtArea_Lst);
+            con.Close();
             return dtArea_Lst;
         }
 
@@ -260,7 +382,8 @@ namespace InstrumentDatabase.Controllers
         private DataTable HomeTabTableView()
         {
 
-            
+            string ConnectionString = ConfigurationManager.ConnectionStrings["cons"].ConnectionString;
+
             SqlConnection con = new SqlConnection(ConnectionString);
 
             SqlCommand cmdInstrumentCount = new SqlCommand("select Instrument_type,Area ,count(*) as Instrument_Count from Instruments group by Area,Instrument_Type order by Instrument_Type,Area", con);
@@ -548,42 +671,408 @@ namespace InstrumentDatabase.Controllers
             }
             FinalTable.Rows.InsertAt(newRowFinalTable1, 0);
 
+            con.Close();
             return FinalTable;
-        }
-        public ActionResult Homepage()
-        {
-            return View();
-        }
-        public ActionResult Equipment()
-        {
-            DataTable DT_Equipment = GetEquipmentData();
-            return View(DT_Equipment);
         }
 
         private DataTable GetEquipmentData()
         {
             DataTable DT_EquipmentData = new DataTable();
+            //SqlConnection con = new SqlConnection("data source =.; database = InstrumentDatabase; integrated security = SSPI");
+            string ConnectionString = ConfigurationManager.ConnectionStrings["cons"].ConnectionString;
+
             SqlConnection con = new SqlConnection(ConnectionString);
-            string EquipmentData_Str = "select SNo,Area,Eq_Type,Tag,P_ID,Eq,FLC_as_in_Eq_List,FLC_in_FLOC,Area2,Remarks from EquipmentTag  where SNo is not null;";
+
+            string EquipmentData_Str = "select SNo,Area,Eq_Type,Tag,P_ID,Eq,FLC_as_in_Eq_List,FLC_in_FLOC,Area2,Remarks from EquipmentTag;";
             SqlCommand cmdEquipmentData = new SqlCommand(EquipmentData_Str, con);
             SqlDataAdapter daEquipmentData = new SqlDataAdapter(cmdEquipmentData);
             daEquipmentData.Fill(DT_EquipmentData);
+            con.Close();
             return DT_EquipmentData;
         }
 
         public ActionResult Instrument()
         {
             DataTable DT_InstrumentData = new DataTable();
+            //SqlConnection con = new SqlConnection("data source =.; database = InstrumentDatabase; integrated security = SSPI");
+
+            string ConnectionString = ConfigurationManager.ConnectionStrings["cons"].ConnectionString;
+
             SqlConnection con = new SqlConnection(ConnectionString);
-            SqlCommand cmdInstrumentData = new SqlCommand("select *from InstrumentData", con);
+
+
+            SqlCommand cmdInstrumentData = new SqlCommand("select * from InstrumentData order by Seq_No DESC", con);
             SqlDataAdapter daInstrumentData = new SqlDataAdapter(cmdInstrumentData);
             daInstrumentData.Fill(DT_InstrumentData);
+
+
+            #region GetInst_type
+
+            //SqlConnection con = new SqlConnection("data source =.; database = InstrumentDatabase; integrated security = SSPI");
+
+            SqlCommand cmdInst_type = new SqlCommand("select distinct Instrument_Type from InstrumentData order by Instrument_Type ASC;", con);
+            SqlDataAdapter daInst_type = new SqlDataAdapter(cmdInst_type);
+            DataTable dtInst_type = new DataTable();
+            daInst_type.Fill(dtInst_type);
+            List<string> Lst_Insttype = new List<string>();
+            for (int i = 0; i < dtInst_type.Rows.Count; i++)
+            {
+                Lst_Insttype.Add(dtInst_type.Rows[i]["Instrument_Type"].ToString());
+            }
+
+            var conqTargets = new SelectList(Lst_Insttype);
+            ViewData["conqTargets"] = conqTargets;
+            //ViewBag.Title = "ManageTargets";
+
+
+            #endregion
+
+            #region GetSeq_No
+
+            SqlCommand cmdSeq_No = new SqlCommand("select max(Seq_no) as Max_Seqno from InstrumentData", con);
+            SqlDataAdapter daSeq_No = new SqlDataAdapter(cmdSeq_No);
+            DataTable dtSeq_No = new DataTable();
+            daSeq_No.Fill(dtSeq_No);
+            int seq_no = Convert.ToInt16(dtSeq_No.Rows[0]["Max_Seqno"].ToString());
+            seq_no = seq_no + 1;
+            //            var conqTargets = new SelectList(Lst_Insttype);
+            ViewData["SeqNo"] = seq_no;
+            //ViewBag.Title = "ManageTargets";
+
+
+            #endregion
+
+            #region GetSeq_No
+
+            SqlCommand cmdMultiSeq_No = new SqlCommand("select max(Seq_no) as Max_Seqno from InstrumentData", con);
+            SqlDataAdapter daMultiSeq_No = new SqlDataAdapter(cmdSeq_No);
+            DataTable dtMultiSeq_No = new DataTable();
+            daSeq_No.Fill(dtMultiSeq_No);
+            int Multiseq_no = Convert.ToInt16(dtMultiSeq_No.Rows[0]["Max_Seqno"].ToString());
+            Multiseq_no = Multiseq_no + 1;
+            //            var conqTargets = new SelectList(Lst_Insttype);
+            ViewData["SeqNoFrom"] = Multiseq_no;
+            //ViewBag.Title = "ManageTargets";
+
+
+            ViewData["SeqNoTo"] = Multiseq_no;
+
+            #endregion
+
+            con.Close();
+
             return View(DT_InstrumentData);
         }
 
+        //public static AreaModel cMainareamodel;
+        //public ActionResult EquipForm()
+        //{
+
+        //    AreaModel objAreamodel = new AreaModel();
+        //    cMainareamodel = new AreaModel();
+        //    objAreamodel.Areas = cMainareamodel.Areas = FillList();
+        //    //ViewBag.lblArea = "";
 
 
-       [HttpGet]
+        //    List<string> Area_Lst = new List<string>();
+        //    SqlConnection con = new SqlConnection("data source =.; database = InstrumentDatabase; integrated security = SSPI");
+        //    SqlCommand cmd_AreaLst = new SqlCommand("select distinct area from EquipmentTag  where SNo is not null;", con);
+        //    SqlDataAdapter daArea_Lst = new SqlDataAdapter(cmd_AreaLst);
+        //    DataTable dtArea_Lst = new DataTable();
+        //    daArea_Lst.Fill(dtArea_Lst);
+        //    for (int i = 0; i < dtArea_Lst.Rows.Count; i++)
+        //    {
+        //        Area_Lst.Add(dtArea_Lst.Rows[i]["Area"].ToString());
+        //    }
+        //    ViewData["Area"] = Area_Lst;
+        //    ViewBag.Area_Lst = Area_Lst;
+        //    //MyEntities e = new MyEntities();
+
+
+        //    #region EquipmentType
+
+        //    int Area = 0;
+        //    string EqType = "select distinct Eq_Type from EquipmentTag where area=" + Area;
+        //    SqlCommand cmd_EqType = new SqlCommand(EqType, con);
+        //    SqlDataAdapter daEqType = new SqlDataAdapter(cmd_EqType);
+        //    DataTable dtEqType = new DataTable();
+        //    daEqType.Fill(dtEqType);
+
+        //    #endregion
+
+        //    #region SequenceNo
+
+        //    string str_SequenceNo = "SELECT MAX(Tag) as Sequence FROM EquipmentTag where SNo is not null";
+        //    SqlCommand cmdSequenceNo = new SqlCommand(str_SequenceNo, con);
+        //    SqlDataAdapter daSequenceNo = new SqlDataAdapter(cmdSequenceNo);
+        //    DataTable dtSequenceNo = new DataTable();
+        //    daSequenceNo.Fill(dtSequenceNo);
+        //    #endregion
+
+        //    //return View(Area_Lst);
+
+        //    return View(objAreamodel);
+        //}
+
+
+        //[HttpPost]
+        //public ActionResult Index(AreaModel areamodel)
+        //{
+        //    var g = cMainareamodel.Areas;
+        //    var selectedCountry = g.Find(p => p.Value == areamodel.Areaid.ToString());
+        //    areamodel.Areas = FillList();
+        //    ViewBag.LblCountry = "You selected " + selectedCountry.Text.ToString();
+        //    return View(areamodel);
+        //}
+
+        public ActionResult InstForm()
+        {
+            #region GetInst_type
+
+            //SqlConnection con = new SqlConnection("data source =.; database = InstrumentDatabase; integrated security = SSPI");
+
+            string ConnectionString = ConfigurationManager.ConnectionStrings["cons"].ConnectionString;
+
+            SqlConnection con = new SqlConnection(ConnectionString);
+
+            SqlCommand cmdInst_type = new SqlCommand("select distinct Instrument_Type from InstrumentData order by Instrument_Type ASC;", con);
+            SqlDataAdapter daInst_type = new SqlDataAdapter(cmdInst_type);
+            DataTable dtInst_type = new DataTable();
+            daInst_type.Fill(dtInst_type);
+            List<string> Lst_Insttype = new List<string>();
+            for (int i = 0; i < dtInst_type.Rows.Count; i++)
+            {
+                Lst_Insttype.Add(dtInst_type.Rows[i]["Instrument_Type"].ToString());
+            }
+
+            var conqTargets = new SelectList(Lst_Insttype);
+            ViewData["conqTargets"] = conqTargets;
+            //ViewBag.Title = "ManageTargets";
+
+
+            #endregion
+
+            #region GetSeq_No
+
+            SqlCommand cmdSeq_No = new SqlCommand("select max(Seq_no) as Max_Seqno from InstrumentData", con);
+            SqlDataAdapter daSeq_No = new SqlDataAdapter(cmdSeq_No);
+            DataTable dtSeq_No = new DataTable();
+            daSeq_No.Fill(dtSeq_No);
+            int seq_no = Convert.ToInt16(dtSeq_No.Rows[0]["Max_Seqno"].ToString());
+            seq_no = seq_no + 1;
+            //            var conqTargets = new SelectList(Lst_Insttype);
+            ViewData["SeqNo"] = seq_no;
+            //ViewBag.Title = "ManageTargets";
+
+
+            #endregion
+
+            con.Close();
+
+            return View();
+        }
+
+        public ActionResult InstDataSave(string InstType, int SeqNo, string InstName, string PnIdNo, string Requestor, string Project)
+        {
+            var instType = InstType;
+            int seqNo = SeqNo;
+            var instName = InstName;
+            var pnIdNo = PnIdNo;
+            var requestor = Requestor;
+            var project = Project;
+
+
+            try
+            {
+                //string ConnectionString = ConfigurationManager.ConnectionStrings["cons"].ConnectionString;
+
+                //SqlConnection con = new SqlConnection(ConnectionString);
+
+                //SqlCommand cmdSeq_No = new SqlCommand("select max(Seq_no) as Max_Seqno from InstrumentData", con);
+                //SqlDataAdapter daSeq_No = new SqlDataAdapter(cmdSeq_No);
+
+                //DataTable dtSeq_No = new DataTable();
+                //daSeq_No.Fill(dtSeq_No);
+                //int seq_no = Convert.ToInt16(dtSeq_No.Rows[0]["Max_Seqno"].ToString());
+                //con.Close();
+
+                //if()
+
+                string ConnectionString = ConfigurationManager.ConnectionStrings["cons"].ConnectionString;
+
+                SqlConnection con = new SqlConnection(ConnectionString);
+
+                SqlCommand cmd_InsertEqDetails = new SqlCommand("InsertInstrumentData", con);
+                cmd_InsertEqDetails.CommandType = CommandType.StoredProcedure;
+                cmd_InsertEqDetails.Parameters.AddWithValue("@InstType", instType);
+                cmd_InsertEqDetails.Parameters.AddWithValue("@SeqNo", seqNo);
+                cmd_InsertEqDetails.Parameters.AddWithValue("@InstName", instName);
+                cmd_InsertEqDetails.Parameters.AddWithValue("@PnIdNo", pnIdNo);
+                cmd_InsertEqDetails.Parameters.AddWithValue("@Requestor", requestor);
+                cmd_InsertEqDetails.Parameters.AddWithValue("@Project", project);
+
+                con.Open();
+                int i = cmd_InsertEqDetails.ExecuteNonQuery();
+                con.Close();
+                if (i >= 1)
+                {
+                    ViewBag.Message = "Saved Successfully";
+                    return View();
+
+                }
+                else
+                {
+
+                    return Json("Failure", JsonRequestBehavior.AllowGet);
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+
+
+        }
+
+        [HttpGet]
+        public ActionResult InstMultiForm()
+        {
+            #region GetSeq_No
+            string ConnectionString = ConfigurationManager.ConnectionStrings["cons"].ConnectionString;
+
+            SqlConnection con = new SqlConnection(ConnectionString);
+
+            SqlCommand cmdSeq_No = new SqlCommand("select max(Seq_no) as Max_Seqno from InstrumentData", con);
+            SqlDataAdapter daSeq_No = new SqlDataAdapter(cmdSeq_No);
+            DataTable dtSeq_No = new DataTable();
+            daSeq_No.Fill(dtSeq_No);
+            int seq_no = Convert.ToInt16(dtSeq_No.Rows[0]["Max_Seqno"].ToString());
+            seq_no = seq_no + 1;
+            //            var conqTargets = new SelectList(Lst_Insttype);
+            ViewData["SeqNoFrom"] = seq_no;
+            //ViewBag.Title = "ManageTargets";
+
+
+            ViewData["SeqNoTo"] = seq_no;
+
+            #endregion
+
+            con.Close();
+
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult getSeqNoRange(int NoOfTag)
+        {
+            int noOfTag = NoOfTag;
+
+            #region GetSeq_No
+            string ConnectionString = ConfigurationManager.ConnectionStrings["cons"].ConnectionString;
+
+            SqlConnection con = new SqlConnection(ConnectionString);
+
+            SqlCommand cmdSeq_No = new SqlCommand("select max(Seq_no) as Max_Seqno from InstrumentData", con);
+            SqlDataAdapter daSeq_No = new SqlDataAdapter(cmdSeq_No);
+            DataTable dtSeq_No = new DataTable();
+            daSeq_No.Fill(dtSeq_No);
+            int seq_no = Convert.ToInt16(dtSeq_No.Rows[0]["Max_Seqno"].ToString());
+            int seq_noFrom = seq_no + 1;
+            //            var conqTargets = new SelectList(Lst_Insttype);
+            ViewData["SeqNoFrom"] = seq_noFrom;
+            //ViewBag.Title = "ManageTargets";
+
+
+            int seq_noTo = seq_noFrom + (noOfTag - 1);
+            ViewData["SeqNoTo"] = seq_noTo;
+            #endregion
+
+
+            //return View("InstMultiForm");
+            return Json(seq_noTo, JsonRequestBehavior.AllowGet);
+
+            //    }
+            //    else
+            //    {
+
+            //        return Json("Failure", JsonRequestBehavior.AllowGet);
+            //    }
+
+            //}
+            //catch (Exception ex)
+            //{
+
+            //    throw;
+            //}
+
+
+        }
+
+        public ActionResult InstMultiDataSave(int SeqNoFrom, int SeqNoTo, string Requestor, string Project)
+        {
+            int seqNoFrom = SeqNoFrom;
+            var seqNoTo = SeqNoTo;
+            var requestor = Requestor;
+            var project = Project;
+
+            int i = 1;
+
+            try
+            {
+                string ConnectionString = ConfigurationManager.ConnectionStrings["cons"].ConnectionString;
+
+                SqlConnection con = new SqlConnection(ConnectionString);
+
+
+                for (int j = SeqNoFrom; j <= SeqNoTo + 1; j++)
+                {
+                    SqlCommand cmd_InsertEqDetails = new SqlCommand("InsertInstrumentMultiData", con);
+                    cmd_InsertEqDetails.CommandType = CommandType.StoredProcedure;
+
+
+                    cmd_InsertEqDetails.Parameters.AddWithValue("@SeqNo", j);
+
+                    cmd_InsertEqDetails.Parameters.AddWithValue("@Requestor", requestor);
+                    cmd_InsertEqDetails.Parameters.AddWithValue("@Project", project);
+
+                    con.Open();
+                    cmd_InsertEqDetails.ExecuteNonQuery();
+
+                    con.Close();
+                }
+                if (i >= 1)
+                {
+                    //ViewBag.Message = "Saved Successfully";
+                    //return Json("Success", JsonRequestBehavior.AllowGet);
+
+                    return RedirectToAction("Instrument", "Home");
+                    //Instrument();
+
+                }
+                else
+                {
+
+                    return Json("Failure", JsonRequestBehavior.AllowGet);
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+
+        }
+
+        public ActionResult Index2()
+        {
+            return View();
+        }
+
+
+        [HttpGet]
         public ActionResult EquipForm()
         {
             GetDetailsEquipment();
@@ -658,10 +1147,10 @@ namespace InstrumentDatabase.Controllers
         }
 
 
-        
         public ActionResult DropDownAreaList()
         {
             AreaModel cMainareamodel = new AreaModel();
+            string ConnectionString = ConfigurationManager.ConnectionStrings["cons"].ConnectionString;
             SqlConnection con = new SqlConnection(ConnectionString);
             List<SelectListItem> Eq_Types = new List<SelectListItem>();
             //int Area = Convert.ToInt32(Request.Form["ddlArea"].ToString());
@@ -680,10 +1169,10 @@ namespace InstrumentDatabase.Controllers
             ViewBag.Eq_Types = Eq_Types;
 
 
-            
+
 
             return View();
-            
+
         }
 
         //[HttpPost]
@@ -700,9 +1189,11 @@ namespace InstrumentDatabase.Controllers
         private List<SelectListItem> FillList()
         {
             var list = new List<SelectListItem>();
-            SqlConnection con = new SqlConnection("data source =.; database = InstrumentDatabase; integrated security = true");
+            string ConnectionString = ConfigurationManager.ConnectionStrings["cons"].ConnectionString;
+            SqlConnection con = new SqlConnection(ConnectionString);
+
             SqlCommand cmd_AreaLst = new SqlCommand("select distinct area from EquipmentTag  where SNo is not null;", con);
-            
+
             SqlDataReader drAreaLst = cmd_AreaLst.ExecuteReader();
             if (drAreaLst.Read())
             {
@@ -712,40 +1203,6 @@ namespace InstrumentDatabase.Controllers
                 }
             }
             return list;
-        }
-
-        public ActionResult InstForm()
-        {
-            #region GetInst_type
-
-            SqlConnection con = new SqlConnection("data source =.; database = InstrumentDatabase; integrated security = SSPI");
-            SqlCommand cmdInst_type = new SqlCommand("select distinct Instrument_Type from InstrumentData order by Instrument_Type ASC;", con);
-            SqlDataAdapter daInst_type = new SqlDataAdapter(cmdInst_type);
-            DataTable dtInst_type = new DataTable();
-            daInst_type.Fill(dtInst_type);
-            List<string> Lst_Insttype = new List<string>();
-            for (int i = 0; i < dtInst_type.Rows.Count; i++)
-            {
-                Lst_Insttype.Add(dtInst_type.Rows[i]["Instrument_Type"].ToString());
-            }
-            #endregion
-
-            #region GetSeq_No
-
-            SqlCommand cmdSeq_No = new SqlCommand("select max(Seq_no)  from InstrumentData", con);
-            SqlDataAdapter daSeq_No = new SqlDataAdapter(cmdSeq_No);
-            DataTable dtSeq_No = new DataTable();
-            daInst_type.Fill(dtSeq_No);
-            int seq_no = Convert.ToInt16(dtSeq_No.Rows[0]["Max_Seqno"].ToString());
-
-            #endregion
-
-            return View();
-        }
-
-        public ActionResult Index2()
-        {
-            return View();
         }
 
         [HttpGet]
@@ -759,6 +1216,7 @@ namespace InstrumentDatabase.Controllers
         private void GetDetailsEquipment()
         {
             AreaModel cMainareamodel = new AreaModel();
+            string ConnectionString = ConfigurationManager.ConnectionStrings["cons"].ConnectionString;
             SqlConnection con = new SqlConnection(ConnectionString);
 
             List<SelectListItem> Area_Lst = new List<SelectListItem>();
@@ -818,7 +1276,7 @@ namespace InstrumentDatabase.Controllers
 
             #region SequenceNo
 
-            string str_SequenceNo = "SELECT MAX(Tag) as Sequence FROM EquipmentTag where SNo is not null";
+            string str_SequenceNo = "SELECT MAX(Tag) as Sequence FROM EquipmentTag";
             SqlCommand cmdSequenceNo = new SqlCommand(str_SequenceNo, con);
             SqlDataAdapter daSequenceNo = new SqlDataAdapter(cmdSequenceNo);
             DataTable dtSequenceNo = new DataTable();
@@ -849,7 +1307,7 @@ namespace InstrumentDatabase.Controllers
                 string Project_Name = string.Empty;
                 foreach (var key in ViewData.ModelState.Keys)
                 {
-                    string  modelStateVal = ViewData.ModelState[key].ToString();
+                    string modelStateVal = ViewData.ModelState[key].ToString();
                     var currentKeyValue = ModelState[key].Value.AttemptedValue;
                     switch (key)
                     {
@@ -883,31 +1341,145 @@ namespace InstrumentDatabase.Controllers
                     }
 
                 }
-                    if (AddEquipmentTypeDetails(Areas,Eq_Types,Seq_No,Eq_name,PIDNo,Areas2,Requestor,Project_Name))
-                    {
-                        ViewBag.Message = "Equipment  details added successfully";
-                    }
-                
+                if (AddEquipmentTypeDetails(Areas, Eq_Types, Seq_No, Eq_name, PIDNo, Areas2, Requestor, Project_Name))
+                {
+                    ViewBag.Message = "Equipment  details added successfully";
+                }
+
 
                 return View();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return View();
             }
         }
 
+        public ActionResult getValues(string RowValues)
+        {
+
+            string ValRow = RowValues;
+
+            //string[] authorsList = ValRow.Split(", ");
+            List<string> names = ValRow.Split(',').ToList<string>();
+            //foreach (string author in authorsList)
+            //Console.WriteLine(author);
+            string InstrumentType = names[0];
+            if (InstrumentType == "")
+            {
+                ViewBag.InstrumentType = "N/A";
+            }
+            else
+            {
+                ViewBag.InstrumentType = InstrumentType;
+            }
+            string TagName = names[1];
+            if (TagName == "")
+            {
+                ViewBag.TagName = "N/A";
+            }
+            else
+            {
+                ViewBag.TagName = TagName;
+            }
+            string LoopNo = names[2];
+            if (LoopNo == "")
+            {
+                ViewBag.LoopNo = "N/A";
+            }
+            else
+            {
+                ViewBag.LoopNo = LoopNo;
+            }
+            string Description = names[3];
+            if (Description == "")
+            {
+                ViewBag.Description = "N/A";
+            }
+            else
+            {
+                ViewBag.Description = Description;
+            }
+            string Type = names[4];
+            if (Type == "")
+            {
+                ViewBag.Type = "N/A";
+            }
+            else
+            {
+                ViewBag.Type = Type;
+            }
+            string Area = names[5];
+            if (Area == "")
+            {
+                ViewBag.Area = "N/A";
+            }
+            else
+            {
+                ViewBag.Area = Area;
+            }
+            string PID = names[6];
+            if (PID == "")
+            {
+                ViewBag.PID = "N/A";
+            }
+            else
+            {
+                ViewBag.PID = PID;
+            }
+            string ModelNo = names[7];
+            if (ModelNo == "")
+            {
+                ViewBag.ModelNo = "N/A";
+            }
+            else
+            {
+                ViewBag.ModelNo = ModelNo;
+            }
+            string NeedsUpdate = names[8];
+            if (NeedsUpdate == "")
+            {
+                ViewBag.NeedsUpdate = "N/A";
+            }
+            else
+            {
+                ViewBag.NeedsUpdate = NeedsUpdate;
+            }
+            string SpecInfo = names[9];
+            if (SpecInfo == "")
+            {
+                ViewBag.SpecInfo = "N/A";
+            }
+            else
+            {
+                ViewBag.SpecInfo = SpecInfo;
+            }
+            //return RedirectToAction("InstDescription", "Home");
+            //return View("InstDescription");
+
+            return Json("Success", JsonRequestBehavior.AllowGet);
+            //if(ValRow=="")
+            //{
+            //    return true;
+            //}
+            //else
+            //{
+            //    return false;
+            //}
+        }
+
 
         //To Add Equipment details
-        public bool AddEquipmentTypeDetails(string Areas, string Eq_Types, string  Seq_No, string Eq_name, string PIDNo, string Areas2, string Requestor, string  Project_Name)
+        public bool AddEquipmentTypeDetails(string Areas, string Eq_Types, string Seq_No, string Eq_name, string PIDNo, string Areas2, string Requestor, string Project_Name)
         {
             try
             {
+                string ConnectionString = ConfigurationManager.ConnectionStrings["cons"].ConnectionString;
                 SqlConnection con = new SqlConnection(ConnectionString);
 
                 //15-C-5564
                 List<SelectListItem> Area = ViewBag.Area;
-                
+
                 string EQ = Areas + "-" + Eq_Types + "-" + Seq_No;
                 SqlCommand cmd_InsertEqDetails = new SqlCommand("InsertEquipmentType", con);
                 cmd_InsertEqDetails.CommandType = CommandType.StoredProcedure;
@@ -919,7 +1491,7 @@ namespace InstrumentDatabase.Controllers
                 cmd_InsertEqDetails.Parameters.AddWithValue("@Area2", Areas2);
                 cmd_InsertEqDetails.Parameters.AddWithValue("@Equipment_Name", Eq_name);
                 cmd_InsertEqDetails.Parameters.AddWithValue("@Requestor", Requestor);
-                cmd_InsertEqDetails.Parameters.AddWithValue("@Project_Name",Project_Name);
+                cmd_InsertEqDetails.Parameters.AddWithValue("@Project_Name", Project_Name);
 
                 con.Open();
                 int i = cmd_InsertEqDetails.ExecuteNonQuery();
@@ -942,7 +1514,7 @@ namespace InstrumentDatabase.Controllers
 
                 throw;
             }
-         }
+        }
 
     }
 }
